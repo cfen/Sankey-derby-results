@@ -113,6 +113,7 @@ function addD3El(){
                     console.log(b)
 
                     var NewY;
+                    
                     b.key == b.gameKey.split("_")[0] ? NewY = 0 : NewY = 36;
                     
                     b.sourceLinks = k(b, b.week), 
@@ -136,7 +137,8 @@ function addD3El(){
                             f.ty = f.target.y, 
                             f.sdy = f.source.dy, 
                             f.tdy = f.target.dy, 
-                            f.dy = b.dy, f.key = b.key, 
+                            f.dy = b.dy, 
+                            f.key = b.key, 
                             f.value = f.target.value, 
                             f.target.totalWins = f.source.totalWins + f.target.win, 
                             f.wins = f.target.totalWins, 
@@ -157,6 +159,7 @@ function addD3El(){
                 m = [1, 1],
                 b = [],
                 c = [];
+
             return k.data = function(a) {
                 return arguments.length ? (_data = a, k) : _data
             }, k.nodeHeight = function(a) {
@@ -237,17 +240,29 @@ function addD3El(){
                         if(decade[0].decadeStr != "pre 1960s"){ filteredArr.push(decade)}
                     })
 
+                    var allGames = []
+
                     _.each(filteredArr, function (decade,k){
 
                         decade.sort(function(a, b){return a.sortDate-b.sortDate});
 
-                        var targetEl = "#derbyChart-"+decade[0]['decadeStr']; 
+                        
 
-                        addAlluvChart(filteredArr[k], s, targetEl )
+                        _.each(decade, function (game){
+                            allGames.push(game)
+                        });
                         //if(decade[0].decadeStr != "pre 1960s"){ filteredArr.push(decade)}
                     })
 
-                    //console.log(filteredArr)
+                    allGames.sort(function(a, b){return a.sortDate-b.sortDate});
+
+                    allGames.reverse();
+
+                   console.log(allGames)
+
+                   var targetEl = "#derbyChart-V"; 
+
+                   addAlluvChart(allGames, s, targetEl )
 
                     
 
@@ -268,8 +283,10 @@ function addD3El(){
 }
 
 
-function addAlluvChart(filteredArr, teamsArr, targetEl){
-
+function addAlluvChart(arrIn, teamsArr, targetEl){
+   
+    var gameSize = 60;
+    var allGameSize = gameSize * arrIn.length;
     globalTeamsArr = teamsArr;
 
         var a = 0,
@@ -287,7 +304,7 @@ function addAlluvChart(filteredArr, teamsArr, targetEl){
                 l = (d3.select("#loser"), d3.select("#game_loser_name")), //tooltip
                 m = d3.select("#game_loser_img"), //tooltip
                 n = d3.select("#game_loser_prob"), //tooltip score 
-                o = 960,
+                o = allGameSize,
                 p = {
                     top: 0,
                     right: 50,
@@ -304,15 +321,22 @@ function addAlluvChart(filteredArr, teamsArr, targetEl){
 
                 
             
-                var g = filteredArr;
+                var g = arrIn;
                 var game;
                 
 
                     /////////// BUILDING DECADEFROM HERE
 
                     r = [], g.forEach(function(a) {
-                        //console.log(a)
-                        game = {}, game.week = Number(a.week), game.season = a.season, game.decadeStr = a.decadeStr, game.away = a.away, game.home = a.home, game.away_prob = Number(a.away_prob), game.home_prob = Number(a.home_prob), r.push(game)
+                        game = {}, 
+                        game.week = Number(a.week), 
+                        game.season = a.season, 
+                        game.decadeStr = a.decadeStr, 
+                        game.away = a.away, 
+                        game.home = a.home, 
+                        game.away_prob = Number(a.away_prob), 
+                        game.home_prob = Number(a.home_prob), 
+                        r.push(game)
                        
                     }), v.data(r).layout();
 
