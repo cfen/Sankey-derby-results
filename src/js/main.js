@@ -280,7 +280,7 @@ function addAlluvChart(filteredArr, teamsArr, targetEl){
                 e = 0,
                 f = 1,
                 g = 50, // used to position nodes top
-                h = d3.select("#game"), //tooltip
+                h = d3.select("#gameToolTip"), //tooltip
                 i = (d3.select("#winner"), d3.select("#game_winner_name")), //tooltip
                 j = d3.select("#game_winner_img"), //tooltip
                 k = d3.select("#game_winner_prob"), //tooltip
@@ -389,9 +389,9 @@ function addAlluvChart(filteredArr, teamsArr, targetEl){
                     .style("stroke", function(a) {
                         return y(a.key)
                     }).style("stroke-opacity", e).on("mouseover", function(a) {
-                        mouseOver(a)
+                        mouseOver(a,h,p,q)
                     }).on("mouseout", function(a) {
-                        mouseExit(a)
+                        mouseExit(a,h,p,q)
                     })
 
                     
@@ -402,7 +402,7 @@ function addAlluvChart(filteredArr, teamsArr, targetEl){
 
 }
 
-function mouseOver(a) {  //this isn't called until rolling over a node
+function mouseOver(a,h,p,q) {  //this isn't called until rolling over a node
         
         console.log(a)
         d3.selectAll("path." + a.key)
@@ -422,14 +422,14 @@ function mouseOver(a) {  //this isn't called until rolling over a node
         //     return this.__data__.key != a.key && this.__data__.opponent != a.key
         // })
         // .transition().style("fill-opacity", d);
-        // h.style("top", function() {
-        //     var b = a.value > .49 ? a.y + p.top + 140 : a.y + p.top + 140 - (20 - a.dy); //p.top + 140
-        //     return b + "px"
-        // })
-        // .style("left", function() {
-        //     return Math.min(q - 130, Math.max(a.x - 37, 20)) + "px"
-        // }), 
-        // h.transition().style("opacity", 1);
+        h.style("top", function() {
+            var b = a.value > .49 ? a.y + p.top + a.y : a.y + p.top + a.y - (20 - a.dy); //p.top + 140
+            return b + "px"
+        })
+        .style("left", function() {
+            return Math.min(q - 130, Math.max(a.x - 37, 20)) + "px"
+        }), 
+        h.transition().style("opacity", 1);
         // var b, c, e, f;
         // a.value > .49 ? (b = s[a.key], c = s[a.opponent], e = a.value, f = a.opponentValue) : (b = s[a.opponent], c = s[a.key], console.log(c), e = a.opponentValue, f = a.value), 
            
@@ -449,7 +449,7 @@ function mouseOver(a) {  //this isn't called until rolling over a node
         // })
 }
 
-function mouseExit(a) { //rollout functionality
+function mouseExit(a,h,p,q) { //rollout functionality
 
         d3.selectAll("path")
         .transition().style("fill-opacity", 0.5)
@@ -467,7 +467,7 @@ function mouseExit(a) { //rollout functionality
         // .transition()
         // .style("font-weight", "normal")
         // .style("font-size", "12px"), 
-        // h.transition().style("opacity", 0)
+        h.transition().style("opacity", 0)
 }
 
 
@@ -500,7 +500,7 @@ function getMax( maxHScore, maxAScore){
         }
 
         function getMonthNum(month){
-            
+
             var n = 0;
 
             if( month == "January"){ n=0 }
