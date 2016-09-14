@@ -1,0 +1,8 @@
+.weekLabel{
+    @include fs-textSans(1);
+}
+
+.fonts__egyptian { @include fs-headline(3); }
+.fonts__text-egyptian { @include fs-bodyCopy(2); }
+.fonts__sans { @include f-headlineSans; }
+.fonts__text-sans { @include fs-textSans(4); }
