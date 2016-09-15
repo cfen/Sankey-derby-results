@@ -97,9 +97,9 @@ function addD3El(){
 
                 }), i = m[1] * j, h = (m[1] - d[0].length * i) / d[0].length, e = (m[0] - l) / (d.length - 1), f = h + i;
 
-                h = 60;
+                h = 90;
 
-                console.log(h,i,j,m, l)
+                //console.log(h,i,j,m,l)
 
                 var o = 0;
 
@@ -110,11 +110,11 @@ function addD3El(){
                 }), 
                 //var oo = 0;
                 b.forEach(function(b) {
-                    console.log(b)
+                    //console.log(b)
 
                     var NewY;
                     
-                    b.key == b.gameKey.split("_")[0] ? NewY = 0 : NewY = 36;
+                    b.key == b.gameKey.split("_")[0] ? NewY = 0 : NewY = h;
                     
                     b.sourceLinks = k(b, b.week), 
                     b.targetLinks = a(b, b.week), 
@@ -154,8 +154,8 @@ function addD3El(){
                 i = 10,
                 j = .01,
                 k = {},
-                l = 8,
-                i = 8,
+                l = 30,
+                i = 30,
                 m = [1, 1],
                 b = [],
                 c = [];
@@ -265,9 +265,6 @@ function addD3El(){
                    addAlluvChart(allGames, s, targetEl )
 
                     
-
-                   
-                    
                 })
             })
 
@@ -278,6 +275,7 @@ function addD3El(){
         }();
 
    function y(a) {
+        console.log(a)
         return s[a].color
     }    
 }
@@ -285,7 +283,7 @@ function addD3El(){
 
 function addAlluvChart(arrIn, teamsArr, targetEl){
    
-    var gameSize = 60;
+    var gameSize = 150;
     var allGameSize = gameSize * arrIn.length;
     globalTeamsArr = teamsArr;
 
@@ -313,17 +311,20 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                 },
                 q = Math.max(o, 800) - p.left - p.right,
                 r = 300 - p.top - p.bottom, //height of svg
-                s = (d3.format(",.0f"), d3.scale.category20(), d3.select(targetEl).append("svg").style("overflow", "visible").attr("width", q + p.left + p.right).attr("height", r + p.top + p.bottom)),
-                t = s.append("g").attr("transform", "translate(" + p.left + "," + p.top + ")"),
-                u = s.append("g").attr("transform", "translate(" + p.left + "," + (p.top + g) + ")"),
-                v = d3.alluvial().nodeWidth(8).nodePadding(10).size([q, r - g]),
+                s = (d3.format(",.0f"), d3.scale.category20(), 
+                    d3.select(targetEl).append("svg").style("overflow", "visible")
+                    .attr("width", r + p.left + p.right)
+                    .attr("height", q + p.top + p.bottom)),
+                t = s.append("g"), //.attr("transform", "translate(" + p.left + "," + p.top + ")")
+                u = s.append("g").attr("width",300), //.attr("transform", "translate(" + p.left + "," + (p.top + g) + ")")
+                
+                v = d3.alluvial().nodeWidth(1).nodePadding(10).size([q, r - g]),
                 w = v.link();
 
                 
             
                 var g = arrIn;
-                var game;
-                
+                var game;                
 
                     /////////// BUILDING DECADEFROM HERE
 
@@ -344,14 +345,14 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                     var z = v.links(),
                         A = v.nodes(),
                         B = v.hOffsets(),
-                        C = t.selectAll(".topLabel").data(B).enter();
+                        C = t.selectAll(".topLabel").data(B).enter()
                     var _seasonsMarkers = [];
 
                     var displaySeason;    
                     // add weeks text 
                     
-                    C.append("text").attr("class", "weekLabel").attr("y", 15 - p.top).attr("x", function(a) {
-                        return a
+                    C.append("text").attr("class", "weekLabel").attr("x", 15 - p.top).attr("y", function(a) {
+                        return a + 15
                     })
                     .text(function(a, b) {
                         var displayTxt;
@@ -367,19 +368,24 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
 
                     _seasonsMarkers.forEach(function(point) {
                         C.append("line").style("stroke", "#EFEFEF").style("stroke-width","1")
-                        .attr("x1",function(a) {
+                        .attr("y1",function(a) {
                             
                             return point - 10
                         })
-                        .attr("x2",function(a) { return point -10 })
-                        .attr("y1", 0)
-                        .attr("y2",120);
+                        .attr("y2",function(a) { return point -10 })
+                        .attr("x1", 0)
+                        .attr("x2",300);
                     });
 
 
 
                     //add links data
-                    var D = (u.append("g").selectAll(".link").data(z).enter().append("path").attr("class", function(a) {
+                    var D = (u.append("g")
+                        .selectAll(".link")
+                        .data(z)
+                        .enter()
+                        .append("path")
+                        .attr("class", function(a) {
                         return "link " + a.key
                     }).attr("d", w).style("fill", function(a) {
                         return y(a.key)
@@ -403,32 +409,53 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                         return "translate(" + a.x + ", "+a.y+")"//" + a.y + "
                     }));
 
-                    D.append("rect").attr("class", function(a) {
+                    D.append("circle").attr("class", function(a) {
                         return "game " + a.key + " " + a.gameKey
-                    }).attr("height", function(a) {
-                        return a.dy
-                    }).attr("width", v.nodeWidth()).style("fill", function(a) {
+                    })
+                    .attr("cy",function(a) {
+                        return a.dy/2
+                    })
+                    // .attr("cx",function(a) {
+                    //     return a.dx/2
+                    // })
+                    .attr("r", function(a) {
+                        return a.dy/2
+                    })
+                    // .attr("width", v.nodeWidth())
+                    .style("fill", function(a) {
                         return y(a.key)
-                    }).style("fill-opacity", 1) //function(a) { return a.value < .5 ? c : .8 }
+                    })
+                    .style("fill-opacity", 1) //function(a) { return a.value < .5 ? c : .8 }
                     .style("stroke", function(a) {
                         return y(a.key)
-                    }).style("stroke-opacity", e).on("mouseover", function(a) {
-                        mouseOver(a,h,p,q)
-                    }).on("mouseout", function(a) {
+                    }).style("stroke-opacity", e)
+                    .on("mouseover", function(a) {
+                        
+                        mouseOver(a,h,p,q, this)
+                    })
+                    .on("mouseout", function(a) {
                         mouseExit(a,h,p,q)
                     })
 
+                    //rotate alluvial
+
                     
+                u.attr('transform', 'translate(240,50)rotate(90)');
 
 
 
-                    /////////// END BUILDING DECADE DATA
+                
+
+                /////////// END BUILDING DECADE DATA
 
 }
 
-function mouseOver(a,h,p,q) {  //this isn't called until rolling over a node
+function mouseOver(a,h,p,q,circleEl ) {  //this isn't called until rolling over a node
         
-        console.log(a)
+        var pos = circleEl.getBoundingClientRect();
+
+        console.log(circleEl)
+
         d3.selectAll("path." + a.key)
         .transition().style("fill-opacity", .9)
         // u.selectAll("rect")
@@ -446,13 +473,11 @@ function mouseOver(a,h,p,q) {  //this isn't called until rolling over a node
         //     return this.__data__.key != a.key && this.__data__.opponent != a.key
         // })
         // .transition().style("fill-opacity", d);
-        h.style("top", function() {
-            var b = a.value > .49 ? a.y + p.top + a.y : a.y + p.top + a.y - (20 - a.dy); //p.top + 140
-            return b + "px"
-        })
-        .style("left", function() {
-            return Math.min(q - 130, Math.max(a.x - 37, 20)) + "px"
-        }), 
+
+
+        //var xywh =element[0][0].getBoundingClientRect();
+
+        h.style("top", pos.top + "px" ).style("left", "0px"), 
         h.transition().style("opacity", 1);
         // var b, c, e, f;
         // a.value > .49 ? (b = s[a.key], c = s[a.opponent], e = a.value, f = a.opponentValue) : (b = s[a.opponent], c = s[a.key], console.log(c), e = a.opponentValue, f = a.value), 
