@@ -10,7 +10,6 @@ var globalTeamsArr;
 
 export function init(el, context, config, mediator) {
     el.innerHTML = mainHTML.replace(/%assetPath%/g, config.assetPath);
-
     addD3El();
 }
 
@@ -112,17 +111,21 @@ function addD3El(){
                 b.forEach(function(b) {
                     console.log(b)
 
-                    var NewY;
+                    var NewY, NewX;
                     
                     b.key == b.gameKey.split("_")[0] ? NewY = 0 : NewY = 36;
+
+                    b.key == b.gameKey.split("_")[0] ? NewX = 0 : NewX = 120;
+
+
                     
                     b.sourceLinks = k(b, b.week), 
                     b.targetLinks = a(b, b.week), 
-                    b.x = b.week * e, 
-                    b.dx = l, 
+                    b.x =  NewX,
+                    b.dx = h * (b.value + 0.05), 
                     b.value >= .5 ? b.y = (b.gameIndex - 1) * (h) : b.y = (b.gameIndex - 1) * (h) + h * (1 - b.value) + 1,  // LOOK HERE - to set right height/position for links
-                    b.y = NewY,
-                    b.dy = h * (b.value + 0.05)
+                    b.y = b.week * e,
+                    b.dy = l
 
                 }), b.forEach(function(b) {
                     if (b.week < d.length - 1) {
@@ -161,10 +164,11 @@ function addD3El(){
                 c = [];
 
             return k.data = function(a) {
-                return arguments.length ? (_data = a, k) : _data
+                return arguments.length ? ( _data = a, k ) : _data
             }, k.nodeHeight = function(a) {
                 return arguments.length ? k : h
             }, k.nodeWidth = function(a) {
+                
                 return arguments.length ? (l = +a, k) : l
             }, k.nodePadding = function(a) {
                 return arguments.length ? (i = +a, k) : i
@@ -192,13 +196,19 @@ function addD3El(){
                         h = a.source.y,
                         i = a.target.y,
                         j = "M " + c + "," + h + " C " + f + ", " + h + " " + g + ", " + i + " " + d + ", " + i + " L " + d + ", " + (i + a.tdy) + " C " + f + ", " + (i + a.tdy) + " " + f + ", " + (h + a.sdy) + " " + c + ", " + (h + a.sdy) + " L " + c + "," + h;
+                    
+                        console.log(a,k)
+
                     return j
                 }
+
                 var b = .5;
                 return a.curvature = function(c) {
                     return arguments.length ? (b = +c, a) : b
                 }, a
+
             }, k
+
         }, 
 
 
@@ -244,13 +254,12 @@ function addD3El(){
 
                     _.each(filteredArr, function (decade,k){
 
-                        decade.sort(function(a, b){return a.sortDate-b.sortDate});
+                        decade.sort(function(a, b){ return a.sortDate-b.sortDate});
 
-                        
+                            _.each(decade, function (game){
+                                allGames.push(game)
+                            });
 
-                        _.each(decade, function (game){
-                            allGames.push(game)
-                        });
                         //if(decade[0].decadeStr != "pre 1960s"){ filteredArr.push(decade)}
                     })
 
@@ -258,28 +267,20 @@ function addD3El(){
 
                     allGames.reverse();
 
-                   console.log(allGames)
+                    console.log(allGames)
 
-                   var targetEl = "#derbyChart-V"; 
+                    var targetEl = "#derbyChart-V"; 
 
-                   addAlluvChart(allGames, s, targetEl )
-
-                    
-
-                   
-                    
+                    addAlluvChart(allGames, s, targetEl )
+      
                 })
             })
 
-
-
-
-
         }();
 
-   function y(a) {
-        return s[a].color
-    }    
+        function y(a) {
+            return s[a].color
+        }    
 }
 
 
@@ -290,7 +291,6 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
     globalTeamsArr = teamsArr;
 
         var a = 0,
-
                 b = 0,
                 c = .4,
                 d = .1,
@@ -304,19 +304,21 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                 l = (d3.select("#loser"), d3.select("#game_loser_name")), //tooltip
                 m = d3.select("#game_loser_img"), //tooltip
                 n = d3.select("#game_loser_prob"), //tooltip score 
-                o = allGameSize,
+                
                 p = {
                     top: 0,
                     right: 50,
                     bottom: 10,
                     left: 50
                 },
+
+                o = allGameSize,
                 q = Math.max(o, 800) - p.left - p.right,
                 r = 300 - p.top - p.bottom, //height of svg
                 s = (d3.format(",.0f"), d3.scale.category20(), d3.select(targetEl).append("svg").style("overflow", "visible").attr("width", q + p.left + p.right).attr("height", r + p.top + p.bottom)),
                 t = s.append("g").attr("transform", "translate(" + p.left + "," + p.top + ")"),
                 u = s.append("g").attr("transform", "translate(" + p.left + "," + (p.top + g) + ")"),
-                v = d3.alluvial().nodeWidth(8).nodePadding(10).size([q, r - g]),
+                v = d3.alluvial().nodeWidth(30).nodePadding(10).size([q, r - g]),
                 w = v.link();
 
                 
@@ -406,10 +408,19 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                     D.append("rect").attr("class", function(a) {
                         return "game " + a.key + " " + a.gameKey
                     }).attr("height", function(a) {
-                        return a.dy
-                    }).attr("width", v.nodeWidth()).style("fill", function(a) {
+                        return 12
+                    }).attr("width", v.nodeWidth())
+
+                    // function(v) {
+                    //     console.log(v)
+                    //     return v.nodeWidth();
+                    // })
+
+
+                    .style("fill", function(a) {
                         return y(a.key)
-                    }).style("fill-opacity", 1) //function(a) { return a.value < .5 ? c : .8 }
+                    })
+                    .style("fill-opacity", 1) //function(a) { return a.value < .5 ? c : .8 }
                     .style("stroke", function(a) {
                         return y(a.key)
                     }).style("stroke-opacity", e).on("mouseover", function(a) {
@@ -540,9 +551,7 @@ function getMax( maxHScore, maxAScore){
             if( month == "November"){ n=10 }
             if( month == "December"){ n=11 }
 
-            if (n.toString().length == 1) {
-                    n = "0" + n;
-                }    
+            if (n.toString().length == 1) { n = "0" + n; }    
 
             return n;
 
