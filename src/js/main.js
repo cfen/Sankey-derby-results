@@ -208,15 +208,47 @@ function addD3El(){
                 return k
             }, k.link = function() {
                 function a(a) {
+
+                    console.log(a)
                     var c = a.source.x + a.source.dx,
+                        cc = a.source.x,
                         d = a.target.x,
                         e = d3.interpolateNumber(c, d),
                         f = e(b),
                         g = e(1 - b),
                         h = a.source.y,
                         i = a.target.y,
-                        j = "M " + c + "," + h + " C " + f + ", " + h + " " + g + ", " + i + " " + d + ", " + i + " L " + d + ", " + (i + a.tdy) + " C " + f + ", " + (i + a.tdy) + " " + f + ", " + (h + a.sdy) + " " + c + ", " + (h + a.sdy) + " L " + c + "," + h;
-                    
+                        j = "M " + c + "," + h + " " + g + ", " + i + " " + d + ", " + i + " L " + d + ", " + (i + a.tdy) + " " + f + ", " + (h + a.sdy) + " " + c + ", " + (h + a.sdy) + " L " + c + "," + h;
+                      
+                      // a object  OUTPUT
+
+                       
+                        // dy : 82.5
+                        // key : "MU"
+                        // sdy : 82.5
+                        // source : Object
+                        // sy : 108.75
+                        // target : Object
+                        // tdy : 52.5
+                        // ty : 123.75
+                        // value : 0.3
+                        // wins : 1
+
+
+                      // a object  OUTPUT
+                        // <circle class="game MU MU_MC_1960–1961_w0"
+                        // cy="41.25"
+                        // r="41.25" 
+                        // style="fill: rgb(176, 1, 1); 
+                        // fill-opacity: 1; 
+                        // stroke: rgb(176, 1, 1); 
+                        // stroke-opacity: 0;
+                        // "></circle>
+                   
+                    //d="M 1(c),108.75(h) 60.5969387755102(g), 123.75(i) 120.1938775510204(d), 123.75(i) L 120.1938775510204(d), 176.25(i + a.tdy) 60.5969387755102(f), 191.25(h + a.sdy) 1, 191.25(h + a.sdy) L 1,108.75"
+
+
+
                         console.log(j)
 
                     return j
