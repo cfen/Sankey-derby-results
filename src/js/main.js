@@ -10,7 +10,6 @@ var globalTeamsArr;
 
 export function init(el, context, config, mediator) {
     el.innerHTML = mainHTML.replace(/%assetPath%/g, config.assetPath);
-
     addD3El();
 }
 
@@ -40,7 +39,6 @@ function addD3El(){
                     if (a.week < 1) return [];
                     var c = d[b - 1],
                         e = c.filter(function(b) {
-
                             return a.key == b.key ? !0 : !1
                         });
 
@@ -52,6 +50,9 @@ function addD3El(){
                 c = [], b = [], d = [];
 
                 var n = 0;
+
+                var lastWinningTeam;
+
 
                 _data.forEach(function(a) {
 
@@ -66,7 +67,10 @@ function addD3El(){
                     node.week = n, 
                     node.opponent = a.home, 
                     node.game = a, 
-                    node.win = a.away_prob >= .5 ? 1 : 0, 
+                    node.win = a.away_prob > a.home_prob  ? 1 : 0, 
+                    node.lose = a.away_prob < a.home_prob ? 1 : 0, 
+                    node.draw = a.away_prob == a.home_prob ? 1 : 0, 
+                    node.winningTeam = getWinningTeam(a),
                     node.totalWins = 0, 
                     node.type = "away", 
                     node.gameIndex = n, 
@@ -85,7 +89,10 @@ function addD3El(){
                     node.week = n, 
                     node.game = a, 
                     node.type = "home", 
-                    node.win = a.home_prob >= .5 ? 1 : 0, 
+                    node.win = a.home_prob > a.away_prob ? 1 : 0,
+                    node.lose = a.home_prob < a.away_prob ? 1 : 0,
+                    node.draw = a.away_prob == a.home_prob ? 1 : 0,
+                    node.winningTeam = getWinningTeam(a),  
                     node.gameIndex = n, 
                     node.totalWins = 0, 
                     node.sourceLinks = [], 
@@ -97,7 +104,7 @@ function addD3El(){
 
                 }), i = m[1] * j, h = (m[1] - d[0].length * i) / d[0].length, e = (m[0] - l) / (d.length - 1), f = h + i;
 
-                h = 90;
+                h = 150;
 
                 //console.log(h,i,j,m,l)
 
@@ -108,21 +115,38 @@ function addD3El(){
                     g.push(o * e), 
                     o++
                 }), 
-                //var oo = 0;
-                b.forEach(function(b) {
-                    //console.log(b)
+
+                
+                b.forEach(function(bObj, count) {
 
                     var NewY;
+                    var n = count-1;
+                    var nn;
+                    var lastWinner;
+
+                    var circR = h * (bObj.value + 0.05);
+
+                    bObj.win ?  NewY = h-(circR/2) : NewY = 0-(circR/2);
+
+                    if(bObj.winningTeam != "draw"){
+                        lastWinningTeam = bObj.winningTeam;
+                    }
+
+                    if(bObj.winningTeam=="draw" ){ 
+                        lastWinner = (lastWinningTeam==bObj.key) //Boolean    
+
+                        lastWinner ? NewY=(h/2)+(circR/2)+1 : NewY=(h/2)-(circR/2)-1;
+                    } 
+
+                    //bObj.winningTeam =="draw" && bObj.key==lastWinningTeam ? NewY = 46 : NewY = 23; 
                     
-                    b.key == b.gameKey.split("_")[0] ? NewY = 0 : NewY = h;
-                    
-                    b.sourceLinks = k(b, b.week), 
-                    b.targetLinks = a(b, b.week), 
-                    b.x = b.week * e, 
-                    b.dx = l, 
-                    b.value >= .5 ? b.y = (b.gameIndex - 1) * (h) : b.y = (b.gameIndex - 1) * (h) + h * (1 - b.value) + 1,  // LOOK HERE - to set right height/position for links
-                    b.y = NewY,
-                    b.dy = h * (b.value + 0.05)
+                    bObj.sourceLinks = k(bObj, bObj.week), 
+                    bObj.targetLinks = a(bObj, bObj.week), 
+                    bObj.x = bObj.week * e, 
+                    bObj.dx = l,
+                    bObj.value >= .5 ? bObj.y = (bObj.gameIndex - 1) * (h) : bObj.y = (bObj.gameIndex - 1) * (h) + h * (1 - bObj.value) + 1,  // LOOK HERE - to set right height/position for links
+                    bObj.y = NewY,
+                    bObj.dy = circR;
 
                 }), b.forEach(function(b) {
                     if (b.week < d.length - 1) {
@@ -191,7 +215,10 @@ function addD3El(){
                         g = e(1 - b),
                         h = a.source.y,
                         i = a.target.y,
-                        j = "M " + c + "," + h + " C " + f + ", " + h + " " + g + ", " + i + " " + d + ", " + i + " L " + d + ", " + (i + a.tdy) + " C " + f + ", " + (i + a.tdy) + " " + f + ", " + (h + a.sdy) + " " + c + ", " + (h + a.sdy) + " L " + c + "," + h;
+                        j = "M " + c + "," + h +  " L " + d + ", " + (i + a.tdy) + " C " + f + ", " + (i + a.tdy) + " " + f + ", " + (h + a.sdy) + " " + c + ", " + (h + a.sdy) + " L " + c + "," + h;
+                    
+                        console.log(j)
+
                     return j
                 }
                 var b = .5;
@@ -209,6 +236,7 @@ function addD3El(){
 
                 var r = [],
                     s = {};
+
                 o.teams.forEach(function(a) {
                     s[a.key] = a;  
                 }), 
@@ -256,7 +284,7 @@ function addD3El(){
 
                     allGames.sort(function(a, b){return a.sortDate-b.sortDate});
 
-                    allGames.reverse();
+                    //allGames.reverse();
 
                    console.log(allGames)
 
@@ -283,7 +311,7 @@ function addD3El(){
 
 function addAlluvChart(arrIn, teamsArr, targetEl){
    
-    var gameSize = 150;
+    var gameSize = 120;
     var allGameSize = gameSize * arrIn.length;
     globalTeamsArr = teamsArr;
 
@@ -519,6 +547,15 @@ function mouseExit(a,h,p,q) { //rollout functionality
         h.transition().style("opacity", 0)
 }
 
+
+function getWinningTeam(a){
+        var s = "draw";
+
+        if(a.home_prob > a.away_prob){ s=a.home }
+        if(a.home_prob < a.away_prob){ s=a.away } 
+
+        return s;
+}
 
 
 function y(a) {
