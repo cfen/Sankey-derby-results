@@ -104,7 +104,7 @@ function addD3El(){
 
                 }), i = m[1] * j, h = (m[1] - d[0].length * i) / d[0].length, e = (m[0] - l) / (d.length - 1), f = h + i;
 
-                h = 150;
+                h = 90;
 
                 //console.log(h,i,j,m,l)
 
@@ -208,6 +208,7 @@ function addD3El(){
                 return k
             }, k.link = function() {
                 function a(a) {
+                    console.log(a)
                     var c = a.source.x + a.source.dx,
                         d = a.target.x,
                         e = d3.interpolateNumber(c, d),
@@ -216,8 +217,8 @@ function addD3El(){
                         h = a.source.y,
                         i = a.target.y,
                         j = "M " + c + "," + h + " C " + f + ", " + h + " " + g + ", " + i + " " + d + ", " + i + " L " + d + ", " + (i + a.tdy) + " C " + f + ", " + (i + a.tdy) + " " + f + ", " + (h + a.sdy) + " " + c + ", " + (h + a.sdy) + " L " + c + "," + h;
-                    
-                        console.log(j)
+                        if(a.source.winningTeam == a.target.winningTeam){ j = "M"+a.source.x+","+a.source.y+" L"+a.target.x+" "+a.target.y+" L"+a.target.x+" "+(a.target.y+a.target.dy)+" L"+a.source.x+" "+(a.source.y+a.source.dy)+" Z" } 
+                        //console.log(j)
 
                     return j
                 }
@@ -312,7 +313,7 @@ function addD3El(){
 function addAlluvChart(arrIn, teamsArr, targetEl){
    
     var gameSize = 120;
-    var allGameSize = gameSize * arrIn.length;
+    var allGameSize = gameSize * (arrIn.length+1);
     globalTeamsArr = teamsArr;
 
         var a = 0,
