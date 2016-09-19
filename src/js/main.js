@@ -218,8 +218,16 @@ function addD3El(){
                         g = e(1 - b),
                         h = a.source.y,
                         i = a.target.y,
-                        j = "M " + c + "," + h + " " + g + ", " + i + " " + d + ", " + i + " L " + d + ", " + (i + a.tdy) + " " + f + ", " + (h + a.sdy) + " " + c + ", " + (h + a.sdy) + " L " + c + "," + h;
+                        ii = a.target.dy,
+                        iii = a.target.y + a.target.dy,
+                        j = "M"+a.source.x+","+a.source.y+" L"+a.target.x+" "+a.target.y+" L"+a.target.x+" "+(a.target.y+a.target.dy)+" L"+a.source.x+" "+(a.source.y+a.source.dy)+" Z"
+
+
+                        // "M " + c + "," + h + " " + g + ", " + i + " " + d + ", " + i + " L " + d + ", " + (i + a.tdy) + " " + f + ", " + (h + a.sdy) + " " + c + ", " + (h + a.sdy) + " L " + c + "," + h;
                       
+                        
+                        // M50 100 L150 100 L180 200 L80 200 Z
+
                       // a object  OUTPUT
 
                        
@@ -249,7 +257,7 @@ function addD3El(){
 
 
 
-                        console.log(j)
+                        console.log(a.source)
 
                     return j
                 }
