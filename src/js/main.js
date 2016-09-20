@@ -288,7 +288,6 @@ function addD3El(){
 
                     if(bObj.winningTeam=="draw" ){ 
                         lastWinner = (lastWinningTeam==bObj.key) //Boolean    
-
                         lastWinner ? NewY=(h/2)+(circR/2)+1 : NewY=(h/2)-(circR/2)-1;
                     } 
 
@@ -419,6 +418,7 @@ function addD3El(){
 
                     var decadesArr = _.groupBy(g, 'decadeStr');
                     var filteredArr = [];
+                    
 
                     _.each(decadesArr, function (decade){
                         if(decade[0].decadeStr != "pre 1960s"){ filteredArr.push(decade)}
@@ -428,13 +428,28 @@ function addD3El(){
 
                     _.each(filteredArr, function (decade,k){
 
-                        decade.sort(function(a, b){return a.sortDate-b.sortDate});
+                        decade.sort(function(a, b){return b.sortDate-a.sortDate});
 
-                        
+                        var targetEl;
+
+                        if (decade[0]['decadeStr']=="2010s") { targetEl = "#derbyChart_2010s"}
+                        if (decade[0]['decadeStr']=="2000s") { targetEl = "#derbyChart_2000s"}
+                        if (decade[0]['decadeStr']=="1990s") { targetEl = "#derbyChart_1990s"}
+                        if (decade[0]['decadeStr']=="1980s") { targetEl = "#derbyChart_1980s"}
+                        if (decade[0]['decadeStr']=="1970s") { targetEl = "#derbyChart_1970s"}
+
+
+                        //console.log(targetEl)
 
                         _.each(decade, function (game){
                             allGames.push(game)
                         });
+
+
+
+
+                        addAlluvChart(decade, s, targetEl )
+
                         //if(decade[0].decadeStr != "pre 1960s"){ filteredArr.push(decade)}
                     })
 
@@ -442,9 +457,11 @@ function addD3El(){
 
                     //allGames.reverse();
 
-                   var targetEl = "#derbyChart-V";  
 
-                   addAlluvChart(allGames, s, targetEl )
+
+                   // Add all matches to one long svg
+                   // var targetEl = "#derbyChart-V";  
+                   // addAlluvChart(allGames, s, targetEl )
 
                     
                 })
@@ -464,12 +481,16 @@ function addD3El(){
 
 var tempColor;
 var gradient;
+
 function addAlluvChart(arrIn, teamsArr, targetEl){
    
     var gameSize = 120;
     var allGameSize = gameSize * (arrIn.length+1);
     globalTeamsArr = teamsArr;
     
+    //var newTgt = document.getElementById(teamsArr, targetEl)
+
+    console.log(targetEl)
 
     var tgtW = d3.select(targetEl)[0][0].offsetWidth;
 
@@ -631,15 +652,22 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                         return y(a.key)
                     }).style("stroke-opacity", e)
                     .on("mouseover", function(a) {
-                        
                         mouseOver(a,h,p,q, this)
                     })
                     .on("mouseout", function(a) {
                         mouseExit(a,h,p,q)
                     })
+                
+
+
+                console.log(u.attr("width"), tgtW)
+                var tgtShim = (tgtW - u.attr("width"))/2 ;
 
                 //rotate alluvial
-                u.attr('transform', 'translate(240,50)rotate(90)');
+                u.attr('transform', 'translate('+tgtShim+',50)rotate(90)');
+
+
+
 
         /////////// END BUILDING DECADE DATA
 
