@@ -39,10 +39,13 @@ function addD3El(){
                     if (a.week < 1) return [];
                     var c = d[b - 1],
                         e = c.filter(function(b) {
+                            console.log(a.key)
+                            console.log(b.key)
+
                             return a.key == b.key ? !0 : !1
                         });
-
-                //console.log(e.length < 1 ? (e = k(a, b - 1), e.length < 1 && console.log("source - can't find team " + a.key + " in week " + (b - 1)), e) : e, e);
+                console.log(c)
+                console.log(e.length < 1 ? (e = k(a, b - 1), e.length < 1 && console.log("source - can't find team " + a.key + " in week " + (b - 1)), e) : e, e);
 
                     return e.length < 1 ? (e = k(a, b - 1), e.length < 1 && console.log("source - can't find team " + a.key + " in week " + (b - 1)), e) : e
                 }
@@ -55,8 +58,6 @@ function addD3El(){
 
 
                 _data.forEach(function(a) {
-
-                    //console.log(a)
 
                     d.push([]), 
                     node = {}, 
@@ -208,7 +209,7 @@ function addD3El(){
                 return k
             }, k.link = function() {
                 function a(a) {
-                    console.log(a)
+                    
                     var c = a.source.x + a.source.dx,
                         d = a.target.x,
                         e = d3.interpolateNumber(c, d),
@@ -216,9 +217,8 @@ function addD3El(){
                         g = e(1 - b),
                         h = a.source.y,
                         i = a.target.y,
-                        j = "M " + c + "," + h + " C " + f + ", " + h + " " + g + ", " + i + " " + d + ", " + i + " L " + d + ", " + (i + a.tdy) + " C " + f + ", " + (i + a.tdy) + " " + f + ", " + (h + a.sdy) + " " + c + ", " + (h + a.sdy) + " L " + c + "," + h;
-                        if(a.source.winningTeam == a.target.winningTeam){ j = "M"+a.source.x+","+a.source.y+" L"+a.target.x+" "+a.target.y+" L"+a.target.x+" "+(a.target.y+a.target.dy)+" L"+a.source.x+" "+(a.source.y+a.source.dy)+" Z" } 
-                        //console.log(j)
+                        j = "M " + c + "," + h + " C " + f + ", " + h + " " + g + ", " + i + " " + d + ", " + i + " L " + d + ", " + (i + a.tdy) + " C " + f + ", " + (i + a.tdy) + " " + f + ", " + (h + a.sdy) + " " + c + ", " + (h + a.sdy) + " L " + c + "," + h;  //  add curves
+                        if(a.source.winningTeam == a.target.winningTeam){ j = "M"+a.source.x+","+a.source.y+" L"+a.target.x+" "+a.target.y+" L"+a.target.x+" "+(a.target.y+a.target.dy)+" L"+a.source.x+" "+(a.source.y+a.source.dy)+" Z" } // remove curves
 
                     return j
                 }
@@ -231,7 +231,6 @@ function addD3El(){
 
 
         function main() {
-
                 
             d3.json("https://interactive.guim.co.uk/2016/08/transfer-window/test-data/prem_teams.json", function(g, o) {
 
@@ -246,11 +245,14 @@ function addD3El(){
                  d3.tsv("https://interactive.guim.co.uk/2016/08/transfer-window/test-data/manchesterDerby.csv", function(g) {
 
                     g.forEach(function(o,k){
+
                             o.year = o.Date.split(" ")[2],
                             o.sortDate = o.Date.split(" ")[2]+getMonthNum(o.Date.split(" ")[1])+getDayNum(o.Date.split(" ")[0]),
                             o.season = getSeason(o.Date),
                             o.decadeStr = getDecade(o.season)[0],
                             o.decadeKey = getDecade(o.season)[1],
+                            // o.home = o.HomeTeam == "Spurs" ? "TH" : "AR",
+                            // o.away = o.HomeTeam == "Arsenal" ? "AR" : "TH",
                             o.home = o.HomeTeam == "City" ? "MC" : "MU",
                             o.away = o.HomeTeam == "Utd" ? "MC" : "MU",
                             o.homeScore = Number(o.Score.split("–")[0]),
@@ -287,9 +289,7 @@ function addD3El(){
 
                     //allGames.reverse();
 
-                   console.log(allGames)
-
-                   var targetEl = "#derbyChart-V"; 
+                   var targetEl = "#derbyChart-V";  
 
                    addAlluvChart(allGames, s, targetEl )
 
@@ -309,12 +309,14 @@ function addD3El(){
     }    
 }
 
-
+var tempColor;
+var gradient;
 function addAlluvChart(arrIn, teamsArr, targetEl){
    
     var gameSize = 120;
     var allGameSize = gameSize * (arrIn.length+1);
     globalTeamsArr = teamsArr;
+    
 
         var a = 0,
 
@@ -416,14 +418,68 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                         .append("path")
                         .attr("class", function(a) {
                         return "link " + a.key
-                    }).attr("d", w).style("fill", function(a) {
-                        return y(a.key)
+                    }).attr("d", w)
+
+                    .style("fill", function(a) {
+
+                        // MC #5cbfeb;
+                        // MU #b00101;
+
+                        var tempColorMC = y("MC");
+
+                        var tempColorMU = y("MU");
+
+                        var gradientMC = u.append("defs")
+                          .append("linearGradient")
+                            .attr("id", "gradientMC")
+                            .attr("x1", "0%")
+                            .attr("y1", "0%")
+                            .attr("x2", "100%")
+                            .attr("y2", "100%")
+                            .attr("spreadMethod", "pad");
+
+                        gradientMC.append("stop")
+                            .attr("offset", "0%")
+                            .attr("stop-color", tempColorMC)
+                            .attr("stop-opacity", 0.3);
+
+                        gradientMC.append("stop")
+                            .attr("offset", "100%")
+                            .attr("stop-color", tempColorMC)
+                            .attr("stop-opacity", 0.9);
+
+                        var gradientMU = u.append("defs")
+                          .append("linearGradient")
+                            .attr("id", "gradientMU")
+                            .attr("x1", "0%")
+                            .attr("y1", "0%")
+                            .attr("x2", "100%")
+                            .attr("y2", "100%")
+                            .attr("spreadMethod", "pad");
+
+                        gradientMU.append("stop")
+                            .attr("offset", "0%")
+                            .attr("stop-color", tempColorMU)
+                            .attr("stop-opacity", 0.3);
+
+                        gradientMU.append("stop")
+                            .attr("offset", "100%")
+                            .attr("stop-color", tempColorMU)
+                            .attr("stop-opacity", 0.9);
+
+                       console.log(a)
+
+                        var tempGrad =  a.key == "MC" ? "url(#gradientMC)" : "url(#gradientMU)";
+
+
+                        return(tempGrad)
+
                     })
                     //.style("fill-opacity", a)
-                    .style("stroke", function(a) {
+                    .style("stroke", function(a) {                    
                         return y(a.key)
                     })
-                    .style("fill-opacity", 0.5)
+                    //.style("fill-opacity", 0.5)
                     .style("stroke-width", .5)
                     .style("stroke-opacity", b), 
 
@@ -576,7 +632,7 @@ function getMax( maxHScore, maxAScore){
             var yy2 = Number(a[1]);
             var s = [ "pre 1960s", 0 ];
 
-                if (yy1 >= 1960 && yy2 <= 1970){ s = ['1960s', 1]}
+                // if (yy1 >= 1960 && yy2 <= 1970){ s = ['1960s', 1]}
                 if (yy1 >= 1970 && yy2 <= 1980){ s = ['1970s', 2]}
                 if (yy1 >= 1980 && yy2 <= 1990){ s = ['1980s', 3]}
                 if (yy1 >= 1990 && yy2 <= 2000){ s = ['1990s', 4]}
