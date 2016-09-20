@@ -1,0 +1,192 @@
+.guvisual-wrapper {
+	border-top: none;
+	margin: 0 auto;
+
+	h2 {
+		@include fs-headline(5);
+		font-weight: 900;
+        margin: 0;
+	}
+	
+	h3 {
+        @include fs-header(2);
+        margin: 0;
+    }
+
+    p {
+        @include fs-bodyCopy(2);
+        margin: 0 0 10px 0;
+        max-width: 640px;
+    }
+
+    p.gv-credit-text {
+    	 @include fs-textSans(1);
+    	 color: #767676;
+    	
+    }
+
+    p.gv-quote-credit {
+    	@include fs-bodyCopy(2);
+    	color: #767676;
+    	
+    	margin-bottom: 20px;
+    	display: block;
+    }
+
+    p.gv-quote {
+    	@include fs-headline(4);
+    	margin: 20px 0 10px 0;
+    	position: relative;
+    	padding-top: 20px;
+    }
+
+    .gv-quote::before {
+    	width: 140px;
+    	height: 2px;
+    	background: #eee;
+    	position: absolute;
+    	top: 0;
+    	left: 0;
+    	content: ' ';
+    }
+
+    span.gv-photo-credit {
+    	@include fs-textSans(1);
+    	 color: #767676;
+    }
+
+    em {
+    	@include fs-header(2);
+    	font-style: normal;
+    	color: #333;
+    }
+
+ 	.text-18 {
+ 		p,h3,p.gv-quote {
+ 			font-size: 16px;
+ 			line-height: 24px;
+ 		}
+
+ 		p.gv-quote-credit {
+ 			font-size: 12px;
+ 			line-height: 18px;
+ 		}
+ 	}
+
+ 	.text-20 {
+ 		p,h3,p.gv-quote {
+ 			font-size: 18px;
+ 			line-height: 24px;
+ 		}
+
+ 		p.gv-quote-credit {
+ 			font-size: 14px;
+ 			line-height: 20px;
+ 		}
+ 	}
+
+ 	.text-24 {
+ 		p,h3,p.gv-quote {
+ 			font-size: 20px;
+ 			line-height: 28px;
+ 		}
+
+ 		p.gv-quote-credit {
+ 			font-size: 16px;
+ 			line-height: 24px;
+ 		}
+
+ 		
+ 	}
+
+ 
+
+    @media(min-width:660px){
+         .text-shadow {
+	    	text-shadow: 0 0 20px rgba(0,0,0,0.8);
+	    }
+
+	    .text-18 {
+	 		p,h3,p.gv-quote,p.gv-quote-credit {
+	 			font-size: 18px;
+	 			line-height: 28px;
+	 		}
+
+	 		p.gv-quote-credit {
+	 			font-size: 14px;
+	 			line-height: 20px;
+	 		}
+	 	}
+
+	 	.text-20 {
+	 		p,h3,p.gv-quote {
+	 			font-size: 20px;
+	 			line-height: 28px;
+	 		}
+	 		p.gv-quote-credit {
+	 			font-size: 16px;
+	 			line-height: 28px;
+	 		}
+	 	}
+
+	 	.text-24 {
+	 		p,h3,p.gv-quote{
+	 			font-size: 24px;
+	 			line-height: 32px;
+	 		}
+
+	 		p.gv-quote-credit {
+	 			font-size: 18px;
+	 			line-height: 28px;
+	 		}	 		
+	 	}
+    }
+
+
+	
+		
+	@media(min-width:980px){
+
+
+		h2 {
+			@include fs-headline(9);
+			font-weight: 900;
+		}
+		
+		h3 {
+	        @include fs-header(3);
+	    }
+
+	    p {
+	        @include fs-bodyCopy(2);
+	    }
+
+	    p.gv-credit-text {
+    		@include fs-textSans(2);
+   		}
+
+   		p.gv-quote-credit {
+	    	@include fs-bodyCopy(3);
+	    }
+
+	    p.gv-quote {
+	    	@include fs-headline(6);
+	    	margin: 0 0 0px 0;
+	    }
+
+	    em {
+	    	@include fs-header(3);
+	    }
+
+
+
+	}
+	
+	@media(min-width:1140px){
+		
+	}
+	
+	@media(min-width:1300px){
+		
+	}
+}

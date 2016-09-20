@@ -13,7 +13,162 @@ export function init(el, context, config, mediator) {
     addD3El();
 }
 
+function addGradients(u){
+        var tempColorMC = y("MC");
 
+        var tempColorMU = y("MU");      
+
+
+        //Win games grads
+        var gradientMCW = u.append("defs")
+          .append("linearGradient")
+            .attr("id", "gradientMCW")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+
+        gradientMCW.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.8);    
+
+        gradientMCW.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.6);
+
+        gradientMCW.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.8);
+
+        var gradientMUW = u.append("defs")
+          .append("linearGradient")
+            .attr("id", "gradientMUW")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+
+        gradientMUW.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.8);
+
+        gradientMUW.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.6);
+
+        gradientMUW.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.8);
+
+
+
+//Draw games grads
+        var gradientMCD = u.append("defs")
+          .append("linearGradient")
+            .attr("id", "gradientMCD")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+
+        gradientMCD.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.5);    
+
+        gradientMCD.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.3);
+
+        gradientMCD.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.5);
+
+        var gradientMUD = u.append("defs")
+          .append("linearGradient")
+            .attr("id", "gradientMUD")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+
+        gradientMUD.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.5);
+
+        gradientMUD.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.3);
+
+        gradientMUD.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.5);
+
+    // game lost
+        var gradientMCL = u.append("defs")
+          .append("linearGradient")
+            .attr("id", "gradientMCL")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+
+        gradientMCL.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.3);    
+
+        gradientMCL.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.1);
+
+        gradientMCL.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.3);
+
+        var gradientMUL = u.append("defs")
+          .append("linearGradient")
+            .attr("id", "gradientMUL")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+
+        gradientMUL.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.3);
+
+        gradientMUL.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.1);
+
+        gradientMUL.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.3);        
+
+}
 
 function addD3El(){
     /*! alluvial_diagram 02-11-2015 */
@@ -39,13 +194,13 @@ function addD3El(){
                     if (a.week < 1) return [];
                     var c = d[b - 1],
                         e = c.filter(function(b) {
-                            console.log(a.key)
-                            console.log(b.key)
+                            // console.log(a.key)
+                            // console.log(b.key)
 
                             return a.key == b.key ? !0 : !1
                         });
-                console.log(c)
-                console.log(e.length < 1 ? (e = k(a, b - 1), e.length < 1 && console.log("source - can't find team " + a.key + " in week " + (b - 1)), e) : e, e);
+                // console.log(c)
+                // console.log(e.length < 1 ? (e = k(a, b - 1), e.length < 1 && console.log("source - can't find team " + a.key + " in week " + (b - 1)), e) : e, e);
 
                     return e.length < 1 ? (e = k(a, b - 1), e.length < 1 && console.log("source - can't find team " + a.key + " in week " + (b - 1)), e) : e
                 }
@@ -53,9 +208,7 @@ function addD3El(){
                 c = [], b = [], d = [];
 
                 var n = 0;
-
                 var lastWinningTeam;
-
 
                 _data.forEach(function(a) {
 
@@ -318,6 +471,10 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
     globalTeamsArr = teamsArr;
     
 
+    var tgtW = d3.select(targetEl)[0][0].offsetWidth;
+
+    //tgtW > 780 ? tgtW = 780 : tgtW = tgtW;
+
         var a = 0,
 
                 b = 0,
@@ -341,12 +498,12 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                     left: 50
                 },
                 q = Math.max(o, 800) - p.left - p.right,
-                r = 300 - p.top - p.bottom, //height of svg
+                r = tgtW  - p.left - p.right, //height of svg
                 s = (d3.format(",.0f"), d3.scale.category20(), 
                     d3.select(targetEl).append("svg").style("overflow", "visible")
                     .attr("width", r + p.left + p.right)
                     .attr("height", q + p.top + p.bottom)),
-                t = s.append("g"), //.attr("transform", "translate(" + p.left + "," + p.top + ")")
+                t = s.append("g").attr("width",r), //.attr("transform", "translate(" + p.left + "," + p.top + ")")
                 u = s.append("g").attr("width",300), //.attr("transform", "translate(" + p.left + "," + (p.top + g) + ")")
                 
                 v = d3.alluvial().nodeWidth(1).nodePadding(10).size([q, r - g]),
@@ -405,11 +562,11 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                         })
                         .attr("y2",function(a) { return point -10 })
                         .attr("x1", 0)
-                        .attr("x2",300);
+                        .attr("x2",tgtW);
                     });
 
-
-
+                    addGradients(u);
+                    var tempGrad;
                     //add links data
                     var D = (u.append("g")
                         .selectAll(".link")
@@ -422,55 +579,14 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
 
                     .style("fill", function(a) {
 
-                        // MC #5cbfeb;
-                        // MU #b00101;
+                        // console.log(a)
 
-                        var tempColorMC = y("MC");
-
-                        var tempColorMU = y("MU");
-
-                        var gradientMC = u.append("defs")
-                          .append("linearGradient")
-                            .attr("id", "gradientMC")
-                            .attr("x1", "0%")
-                            .attr("y1", "0%")
-                            .attr("x2", "100%")
-                            .attr("y2", "100%")
-                            .attr("spreadMethod", "pad");
-
-                        gradientMC.append("stop")
-                            .attr("offset", "0%")
-                            .attr("stop-color", tempColorMC)
-                            .attr("stop-opacity", 0.3);
-
-                        gradientMC.append("stop")
-                            .attr("offset", "100%")
-                            .attr("stop-color", tempColorMC)
-                            .attr("stop-opacity", 0.9);
-
-                        var gradientMU = u.append("defs")
-                          .append("linearGradient")
-                            .attr("id", "gradientMU")
-                            .attr("x1", "0%")
-                            .attr("y1", "0%")
-                            .attr("x2", "100%")
-                            .attr("y2", "100%")
-                            .attr("spreadMethod", "pad");
-
-                        gradientMU.append("stop")
-                            .attr("offset", "0%")
-                            .attr("stop-color", tempColorMU)
-                            .attr("stop-opacity", 0.3);
-
-                        gradientMU.append("stop")
-                            .attr("offset", "100%")
-                            .attr("stop-color", tempColorMU)
-                            .attr("stop-opacity", 0.9);
-
-                       console.log(a)
-
-                        var tempGrad =  a.key == "MC" ? "url(#gradientMC)" : "url(#gradientMU)";
-
+                        if (a.key == "MC" && a.target.win){ tempGrad = "url(#gradientMCW)"}
+                        if (a.key == "MU" && a.target.win){ tempGrad = "url(#gradientMUW)"}
+                        if (a.key == "MC" && a.target.draw){ tempGrad = "url(#gradientMCD)"}
+                        if (a.key == "MU" && a.target.draw){ tempGrad = "url(#gradientMUD)"}
+                        if (a.key == "MC" && a.target.lose){ tempGrad = "url(#gradientMCL)"}
+                        if (a.key == "MU" && a.target.lose){ tempGrad = "url(#gradientMUL)"}
 
                         return(tempGrad)
 
@@ -522,16 +638,10 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                         mouseExit(a,h,p,q)
                     })
 
-                    //rotate alluvial
-
-                    
+                //rotate alluvial
                 u.attr('transform', 'translate(240,50)rotate(90)');
 
-
-
-                
-
-                /////////// END BUILDING DECADE DATA
+        /////////// END BUILDING DECADE DATA
 
 }
 
