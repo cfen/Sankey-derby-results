@@ -2,6 +2,8 @@ import reqwest from 'reqwest'
 import mainHTML from './text/main.html!text'
 import share from './lib/share'
 import _ from 'lodash'
+import moment from 'moment'
+
 import d3 from './lib/d3.min_04_30_15.js'
 
 var shareFn = share('Interactive title', 'http://gu.com/p/URL', '#Interactive');
@@ -232,7 +234,7 @@ function addD3El(){
                     node.targetLinks = [], 
                     b.push(node), 
                     
-                    d[node.week].push(node), 
+                    d[n].push(node), 
 
                     node = {}, 
                     node.key = a.home, 
@@ -252,7 +254,8 @@ function addD3El(){
                     node.sourceLinks = [], 
                     node.targetLinks = [], 
                     b.push(node), 
-                    d[node.week].push(node), 
+
+                    d[n].push(node), 
                     
                     n++
 
@@ -295,7 +298,7 @@ function addD3El(){
                     
                     bObj.sourceLinks = k(bObj, bObj.week), 
                     bObj.targetLinks = a(bObj, bObj.week), 
-                    bObj.x = bObj.week * e, 
+                    bObj.x = bObj.week * e, // need to change to plot on date line here
                     bObj.dx = l,
                     bObj.value >= .5 ? bObj.y = (bObj.gameIndex - 1) * (h) : bObj.y = (bObj.gameIndex - 1) * (h) + h * (1 - bObj.value) + 1,  // LOOK HERE - to set right height/position for links
                     bObj.y = NewY,
@@ -430,15 +433,15 @@ function addD3El(){
 
                         decade.sort(function(a, b){return b.sortDate-a.sortDate});
 
-                        var targetEl;
+                        var targetEl,  startTime, endTime;
 
-                        if (decade[0]['decadeStr']=="2010s") { targetEl = "#derbyChart_2010s"}
-                        if (decade[0]['decadeStr']=="2000s") { targetEl = "#derbyChart_2000s"}
-                        if (decade[0]['decadeStr']=="1990s") { targetEl = "#derbyChart_1990s"}
-                        if (decade[0]['decadeStr']=="1980s") { targetEl = "#derbyChart_1980s"}
-                        if (decade[0]['decadeStr']=="1970s") { targetEl = "#derbyChart_1970s"}
+                        if (decade[0]['decadeStr']=="2010s") { targetEl = "#derbyChart_2010s"; startTime = moment('2010 August', 'YYYY MMM', 'en');  endTime = moment('2016 July', 'YYYY MMM', 'en')}
+                        if (decade[0]['decadeStr']=="2000s") { targetEl = "#derbyChart_2000s"; startTime = moment('2000 August', 'YYYY MMM', 'en');  endTime = moment('2010 July', 'YYYY MMM', 'en')}
+                        if (decade[0]['decadeStr']=="1990s") { targetEl = "#derbyChart_1990s"; startTime = moment('1990 August', 'YYYY MMM', 'en');  endTime = moment('2000 July', 'YYYY MMM', 'en')}
+                        if (decade[0]['decadeStr']=="1980s") { targetEl = "#derbyChart_1980s"; startTime = moment('1980 August', 'YYYY MMM', 'en');  endTime = moment('1990 July', 'YYYY MMM', 'en')}
+                        if (decade[0]['decadeStr']=="1970s") { targetEl = "#derbyChart_1970s"; startTime = moment('1970 August', 'YYYY MMM', 'en');  endTime = moment('1980 July', 'YYYY MMM', 'en')}
 
-
+                        
                         //console.log(targetEl)
 
                         _.each(decade, function (game){
@@ -448,7 +451,7 @@ function addD3El(){
 
 
 
-                        addAlluvChart(decade, s, targetEl )
+                        addAlluvChart(decade, s, targetEl, startTime, endTime )
 
                         //if(decade[0].decadeStr != "pre 1960s"){ filteredArr.push(decade)}
                     })
@@ -482,15 +485,14 @@ function addD3El(){
 var tempColor;
 var gradient;
 
-function addAlluvChart(arrIn, teamsArr, targetEl){
-   
-    var gameSize = 120;
+function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
+ 
+    var gameSize = 90;
     var allGameSize = gameSize * (arrIn.length+1);
+
     globalTeamsArr = teamsArr;
     
-    //var newTgt = document.getElementById(teamsArr, targetEl)
-
-    console.log(targetEl)
+    //var newTgt = document.getElementById(teamsArr, targetEl);
 
     var tgtW = d3.select(targetEl)[0][0].offsetWidth;
 
@@ -515,7 +517,7 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                 p = {
                     top: 0,
                     right: 50,
-                    bottom: 10,
+                    bottom: 120,
                     left: 50
                 },
                 q = Math.max(o, 800) - p.left - p.right,
@@ -533,11 +535,12 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                 
             
                 var g = arrIn;
-                var game;                
-
-                    /////////// BUILDING DECADEFROM HERE
+                var game;      
+                
+                /////////// BUILDING DECADE FROM HERE
 
                     r = [], g.forEach(function(a) {
+                        //console.log("GET THE POSITION IN RANGE HERE", moment(a.Date).format('X') )  
                         game = {}, 
                         game.week = Number(a.week), 
                         game.season = a.season, 
@@ -546,6 +549,10 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                         game.home = a.home, 
                         game.away_prob = Number(a.away_prob), 
                         game.home_prob = Number(a.home_prob), 
+                        game.unixStamp = moment(a.Date).format('X'),
+                        game.unixPos = ((moment(a.Date).format('X') - moment(startTime).format('X')) / (endTime - startTime)) * 1000, 
+                        game.yPos = q * game.unixPos,
+                        console.log(game)
                         r.push(game)
                        
                     }), v.data(r).layout();
@@ -625,6 +632,8 @@ function addAlluvChart(arrIn, teamsArr, targetEl){
                     .data(A)
                     .enter().append("g")
                     .attr("class", "node").attr("transform", function(a) {
+
+                        console.log(a)
                         //console.log(a,"Add this functionality to drawing of lines");
                         // var NewY;
                         // a.key == a.gameKey.split("_")[0] ? NewY = 0 : NewY = a.game.home_prob * 10 * 65;
