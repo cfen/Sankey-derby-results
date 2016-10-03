@@ -397,9 +397,11 @@ function addD3El(){
                 }), 
 
 
-                 d3.tsv("https://interactive.guim.co.uk/2016/08/transfer-window/test-data/manchesterDerby.csv", function(g) {
+                 d3.json("https://interactive.guim.co.uk/docsdata-test/18uWr4OKGoJSPO3OVeKtxpwjGb2Iu1VDJeUDHKap-qn0.json", function(g) {
 
-                    g.forEach(function(o,k){
+                    var resultsArr = g.sheets.Sheet1;
+
+                    resultsArr.forEach(function(o,k){
 
                             o.year = o.Date.split(" ")[2],
                             o.sortDate = o.Date.split(" ")[2]+getMonthNum(o.Date.split(" ")[1])+getDayNum(o.Date.split(" ")[0]),
@@ -408,18 +410,19 @@ function addD3El(){
                             o.decadeKey = getDecade(o.season)[1],
                             // o.home = o.HomeTeam == "Spurs" ? "TH" : "AR",
                             // o.away = o.HomeTeam == "Arsenal" ? "AR" : "TH",
-                            o.home = o.HomeTeam == "City" ? "MC" : "MU",
-                            o.away = o.HomeTeam == "Utd" ? "MC" : "MU",
-                            o.homeScore = Number(o.Score.split("–")[0]),
-                            o.awayScore = Number(o.Score.split("–")[1]),
+                            o.home = o.HomeTeam == "Spurs" ? "MC" : "MU",
+                            o.away = o.HomeTeam == "Arsenal" ? "MC" : "MU",
+                            o.homeScore = Number(o.Score.split("-")[0]),
+                            o.awayScore = Number(o.Score.split("-")[1]),
                             o.home_prob = o.homeScore/10,
                             o.away_prob = o.awayScore/10,
                             o.comp = o.Competition.split(" ").join("_"),
                             o.uniqRef = k,
                             o.week = k
+
                         })
 
-                    var decadesArr = _.groupBy(g, 'decadeStr');
+                    var decadesArr = _.groupBy(resultsArr, 'decadeStr');
                     var filteredArr = [];
                     
 
@@ -442,7 +445,7 @@ function addD3El(){
                         if (decade[0]['decadeStr']=="1970s") { targetEl = "#derbyChart_1970s"; startTime = moment('1970 August', 'YYYY MMM', 'en');  endTime = moment('1980 July', 'YYYY MMM', 'en')}
 
                         
-                        //console.log(targetEl)
+                        console.log(decade[0])
 
                         _.each(decade, function (game){
                             allGames.push(game)
@@ -486,6 +489,8 @@ var tempColor;
 var gradient;
 
 function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
+
+    console.log(targetEl)
  
     var gameSize = 90;
     var allGameSize = gameSize * (arrIn.length+1);
@@ -829,6 +834,7 @@ function getMax( maxHScore, maxAScore){
             var season;
             var month = dateArr[1];
             var yyyy = Number(dateArr[2]);
+
 
                 if( month == "January" || month == "February" ||  month == "March" ||  month == "April" ||  month == "May" ||  month == "June" ){ season = (yyyy-1)+"–"+yyyy }
                 if( month == "July" || month == "August" ||  month == "September" ||  month == "October" ||  month == "November" ||  month == "December" ){ season = yyyy+"–"+(yyyy+1) }
