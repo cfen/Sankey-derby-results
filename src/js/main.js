@@ -15,162 +15,6 @@ export function init(el, context, config, mediator) {
     addD3El();
 }
 
-function addGradients(u){
-        var tempColorMC = y("MC");
-
-        var tempColorMU = y("MU");      
-
-        //Win games grads
-        var gradientMCW = u.append("defs")
-          .append("linearGradient")
-            .attr("id", "gradientMCW")
-            .attr("x1", "0%")
-            .attr("y1", "0%")
-            .attr("x2", "100%")
-            .attr("y2", "100%")
-            .attr("spreadMethod", "pad");
-
-        gradientMCW.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", tempColorMC)
-            .attr("stop-opacity", 0.8);    
-
-        gradientMCW.append("stop")
-            .attr("offset", "50%")
-            .attr("stop-color", tempColorMC)
-            .attr("stop-opacity", 0.6);
-
-        gradientMCW.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", tempColorMC)
-            .attr("stop-opacity", 0.8);
-
-        var gradientMUW = u.append("defs")
-          .append("linearGradient")
-            .attr("id", "gradientMUW")
-            .attr("x1", "0%")
-            .attr("y1", "0%")
-            .attr("x2", "100%")
-            .attr("y2", "100%")
-            .attr("spreadMethod", "pad");
-
-        gradientMUW.append("stop")
-            .attr("offset", "0%")
-            .attr("stop-color", tempColorMU)
-            .attr("stop-opacity", 0.8);
-
-        gradientMUW.append("stop")
-            .attr("offset", "50%")
-            .attr("stop-color", tempColorMU)
-            .attr("stop-opacity", 0.6);
-
-        gradientMUW.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", tempColorMU)
-            .attr("stop-opacity", 0.8);
-
-
-
-//Draw games grads
-        var gradientMCD = u.append("defs")
-          .append("linearGradient")
-            .attr("id", "gradientMCD")
-            .attr("x1", "0%")
-            .attr("y1", "0%")
-            .attr("x2", "100%")
-            .attr("y2", "100%")
-            .attr("spreadMethod", "pad");
-
-        gradientMCD.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", tempColorMC)
-            .attr("stop-opacity", 0.5);    
-
-        gradientMCD.append("stop")
-            .attr("offset", "50%")
-            .attr("stop-color", tempColorMC)
-            .attr("stop-opacity", 0.3);
-
-        gradientMCD.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", tempColorMC)
-            .attr("stop-opacity", 0.5);
-
-        var gradientMUD = u.append("defs")
-          .append("linearGradient")
-            .attr("id", "gradientMUD")
-            .attr("x1", "0%")
-            .attr("y1", "0%")
-            .attr("x2", "100%")
-            .attr("y2", "100%")
-            .attr("spreadMethod", "pad");
-
-        gradientMUD.append("stop")
-            .attr("offset", "0%")
-            .attr("stop-color", tempColorMU)
-            .attr("stop-opacity", 0.5);
-
-        gradientMUD.append("stop")
-            .attr("offset", "50%")
-            .attr("stop-color", tempColorMU)
-            .attr("stop-opacity", 0.3);
-
-        gradientMUD.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", tempColorMU)
-            .attr("stop-opacity", 0.5);
-
-    // game lost
-        var gradientMCL = u.append("defs")
-          .append("linearGradient")
-            .attr("id", "gradientMCL")
-            .attr("x1", "0%")
-            .attr("y1", "0%")
-            .attr("x2", "100%")
-            .attr("y2", "100%")
-            .attr("spreadMethod", "pad");
-
-        gradientMCL.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", tempColorMC)
-            .attr("stop-opacity", 0.3);    
-
-        gradientMCL.append("stop")
-            .attr("offset", "50%")
-            .attr("stop-color", tempColorMC)
-            .attr("stop-opacity", 0.1);
-
-        gradientMCL.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", tempColorMC)
-            .attr("stop-opacity", 0.3);
-
-        var gradientMUL = u.append("defs")
-          .append("linearGradient")
-            .attr("id", "gradientMUL")
-            .attr("x1", "0%")
-            .attr("y1", "0%")
-            .attr("x2", "100%")
-            .attr("y2", "100%")
-            .attr("spreadMethod", "pad");
-
-        gradientMUL.append("stop")
-            .attr("offset", "0%")
-            .attr("stop-color", tempColorMU)
-            .attr("stop-opacity", 0.3);
-
-        gradientMUL.append("stop")
-            .attr("offset", "50%")
-            .attr("stop-color", tempColorMU)
-            .attr("stop-opacity", 0.1);
-
-        gradientMUL.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", tempColorMU)
-            .attr("stop-opacity", 0.3);        
-
-}
-
 function addD3El(){
     /*! alluvial_diagram 02-11-2015 */
 
@@ -846,3 +690,159 @@ function getMax( maxHScore, maxAScore){
 
             return season;
         }
+
+function addGradients(u){
+        var tempColorMC = y("MC");
+
+        var tempColorMU = y("MU");      
+
+        //Win games grads
+        var gradientMCW = u.append("defs")
+          .append("linearGradient")
+            .attr("id", "gradientMCW")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+
+        gradientMCW.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.8);    
+
+        gradientMCW.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.6);
+
+        gradientMCW.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.8);
+
+        var gradientMUW = u.append("defs")
+          .append("linearGradient")
+            .attr("id", "gradientMUW")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+
+        gradientMUW.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.8);
+
+        gradientMUW.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.6);
+
+        gradientMUW.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.8);
+
+
+
+//Draw games grads
+        var gradientMCD = u.append("defs")
+          .append("linearGradient")
+            .attr("id", "gradientMCD")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+
+        gradientMCD.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.5);    
+
+        gradientMCD.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.3);
+
+        gradientMCD.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.5);
+
+        var gradientMUD = u.append("defs")
+          .append("linearGradient")
+            .attr("id", "gradientMUD")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+
+        gradientMUD.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.5);
+
+        gradientMUD.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.3);
+
+        gradientMUD.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.5);
+
+    // game lost
+        var gradientMCL = u.append("defs")
+          .append("linearGradient")
+            .attr("id", "gradientMCL")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+
+        gradientMCL.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.3);    
+
+        gradientMCL.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.1);
+
+        gradientMCL.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMC)
+            .attr("stop-opacity", 0.3);
+
+        var gradientMUL = u.append("defs")
+          .append("linearGradient")
+            .attr("id", "gradientMUL")
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "100%")
+            .attr("spreadMethod", "pad");
+
+        gradientMUL.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.3);
+
+        gradientMUL.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.1);
+
+        gradientMUL.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", tempColorMU)
+            .attr("stop-opacity", 0.3);        
+
+}
