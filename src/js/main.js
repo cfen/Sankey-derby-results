@@ -20,7 +20,6 @@ function addGradients(u){
 
         var tempColorMU = y("MU");      
 
-
         //Win games grads
         var gradientMCW = u.append("defs")
           .append("linearGradient")
@@ -481,6 +480,7 @@ function addD3El(){
 
    function y(a) {
         console.log(a)
+        console.log(s[a].color)
         return s[a].color
     }    
 }
@@ -557,7 +557,7 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
                         game.unixStamp = moment(a.Date).format('X'),
                         game.unixPos = ((moment(a.Date).format('X') - moment(startTime).format('X')) / (endTime - startTime)) * 1000, 
                         game.yPos = q * game.unixPos,
-                        console.log(game)
+                        //console.log(game)
                         r.push(game)
                        
                     }), v.data(r).layout();
@@ -638,7 +638,7 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
                     .enter().append("g")
                     .attr("class", "node").attr("transform", function(a) {
 
-                        console.log(a)
+                        //console.log(a)
                         //console.log(a,"Add this functionality to drawing of lines");
                         // var NewY;
                         // a.key == a.gameKey.split("_")[0] ? NewY = 0 : NewY = a.game.home_prob * 10 * 65;
@@ -768,7 +768,12 @@ function getWinningTeam(a){
 
 
 function y(a) {
-        return globalTeamsArr[a].color;
+        // output different colors for arse and spurs
+        var c = globalTeamsArr[a].color
+
+        c == "#b00101" ? c ="#ff9b0b" : c = "#005689";
+
+        return c;
 }
 
 
