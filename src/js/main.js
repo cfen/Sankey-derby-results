@@ -3,8 +3,11 @@ import mainHTML from './text/main.html!text'
 import share from './lib/share'
 import _ from 'lodash'
 import moment from 'moment'
+import iframeMessenger from "https://interactive.guim.co.uk/libs/iframe-messenger/iframeMessenger.js"
 
 import d3 from './lib/d3.min_04_30_15.js'
+
+import swoopyArrow from './lib/swoopyArrow'
 
 var shareFn = share('Interactive title', 'http://gu.com/p/URL', '#Interactive');
 
@@ -13,6 +16,7 @@ var globalTeamsArr;
 export function init(el, context, config, mediator) {
     el.innerHTML = mainHTML.replace(/%assetPath%/g, config.assetPath);
     addD3El();
+    iframeMessenger.enableAutoResize();
 }
 
 function addD3El(){
@@ -126,7 +130,7 @@ function addD3El(){
 
                     var circR = h * (bObj.value + 0.05);
 
-                    bObj.win ?  NewY = h-(circR/2) : NewY = 0-(circR/2);
+                    bObj.win ?  NewY = 0-(circR/2) : NewY = h-(circR/2); //reverse for vertical version
 
                     if(bObj.winningTeam != "draw"){
                         lastWinningTeam = bObj.winningTeam;
@@ -287,8 +291,6 @@ function addD3El(){
                         if (decade[0]['decadeStr']=="1980s") { targetEl = "#derbyChart_1980s"; startTime = moment('1980 August', 'YYYY MMM', 'en');  endTime = moment('1990 July', 'YYYY MMM', 'en')}
                         if (decade[0]['decadeStr']=="1970s") { targetEl = "#derbyChart_1970s"; startTime = moment('1970 August', 'YYYY MMM', 'en');  endTime = moment('1980 July', 'YYYY MMM', 'en')}
 
-                        
-                        console.log(decade[0])
 
                         _.each(decade, function (game){
                             allGames.push(game)
@@ -334,16 +336,14 @@ var gradient;
 
 function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
 
-    console.log(targetEl)
- 
-    var gameSize = 90;
-    var allGameSize = gameSize * (arrIn.length+1);
-
     globalTeamsArr = teamsArr;
     
     //var newTgt = document.getElementById(teamsArr, targetEl);
-
+    var currSVG;
     var tgtW = d3.select(targetEl)[0][0].offsetWidth;
+
+    var gameSize = tgtW/arrIn.length;
+    var allGameSize = gameSize * (arrIn.length+1);
 
     //tgtW > 780 ? tgtW = 780 : tgtW = tgtW;
 
@@ -372,7 +372,8 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
                 q = Math.max(o, 800) - p.left - p.right,
                 r = tgtW  - p.left - p.right, //height of svg
                 s = (d3.format(",.0f"), d3.scale.category20(), 
-                    d3.select(targetEl).append("svg").style("overflow", "visible")
+
+                currSVG = d3.select(targetEl).append("svg").style("overflow", "visible")
                     .attr("width", r + p.left + p.right)
                     .attr("height", q + p.top + p.bottom)),
                 t = s.append("g").attr("width",r), //.attr("transform", "translate(" + p.left + "," + p.top + ")")
@@ -416,9 +417,9 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
                     var displaySeason;    
                     // add weeks text 
                     
-                    C.append("text").attr("class", "weekLabel").attr("x", 15 - p.top).attr("y", function(a) {
-                        return a + 15
-                    })
+                    C.append("text").attr("class", "weekLabel").attr("x", function(a) {
+                        return a + 3
+                    }).attr("y", 0)
                     .text(function(a, b) {
                         var displayTxt;
                         if(r[b]['season'] != displaySeason){ _seasonsMarkers.push(a) };
@@ -433,13 +434,13 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
 
                     _seasonsMarkers.forEach(function(point) {
                         C.append("line").style("stroke", "#EFEFEF").style("stroke-width","1")
-                        .attr("y1",function(a) {
+                        .attr("x1",function(a) {
                             
                             return point - 10
                         })
-                        .attr("y2",function(a) { return point -10 })
-                        .attr("x1", 0)
-                        .attr("x2",tgtW);
+                        .attr("x2",function(a) { return point -10 })
+                        .attr("y1", 0)
+                        .attr("y2",tgtW);
                     });
 
                     addGradients(u);
@@ -488,8 +489,11 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
                         // a.key == a.gameKey.split("_")[0] ? NewY = 0 : NewY = a.game.home_prob * 10 * 65;
                         return "translate(" + a.x + ", "+a.y+")"//" + a.y + "
                     }));
-
+                    
                     D.append("circle").attr("class", function(a) {
+
+                    var currBubble = d3.select(this) 
+                    if(a.week == 3){  annotate(currBubble, a, currSVG)  } 
                         return "game " + a.key + " " + a.gameKey
                     })
                     .attr("cy",function(a) {
@@ -508,21 +512,21 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
                     .style("fill-opacity", 1) //function(a) { return a.value < .5 ? c : .8 }
                     .style("stroke", function(a) {
                         return y(a.key)
-                    }).style("stroke-opacity", e)
+                    })
+                    .style("stroke-opacity", e)
                     .on("mouseover", function(a) {
                         mouseOver(a,h,p,q, this)
                     })
                     .on("mouseout", function(a) {
                         mouseExit(a,h,p,q)
                     })
+                  
+
                 
-
-
-                console.log(u.attr("width"), tgtW)
                 var tgtShim = (tgtW - u.attr("width"))/2 ;
 
                 //rotate alluvial
-                u.attr('transform', 'translate('+tgtShim+',50)rotate(90)');
+                u.attr('transform', 'translate(0 ,50)'); // u.attr('transform', 'translate('+tgtShim+',50)rotate(90)');
 
 
 
@@ -615,7 +619,9 @@ function y(a) {
         // output different colors for arse and spurs
         var c = globalTeamsArr[a].color
 
-        c == "#b00101" ? c ="#ff9b0b" : c = "#005689";
+        c == "#b00101" ? c ="#b00101" : c = "#005689";
+
+        // c == "#5cbfeb" ? c ="#ff9b0b" : c = "#005689";
 
         return c;
 }
@@ -846,3 +852,68 @@ function addGradients(u){
             .attr("stop-opacity", 0.3);        
 
 }
+
+function annotate(currBubble,dIn,svg){
+
+                             svg.append('defs')
+                              .append("marker")
+                                .attr("id", "arrowhead")
+                                .attr("viewBox", "-10 -10 20 20")
+                                .attr("refX", 0)
+                                .attr("refY", 0)
+                                .attr("fill","#666")
+                                .attr("markerWidth", 14)
+                                .attr("markerHeight", 14)
+                                .attr("stroke-width", 1)
+                                .attr("orient", "auto")
+                              .append("polyline")
+                                .attr("stroke-linejoin", "bevel")
+                                .attr("points", "-6.75,-6.75 0,0 -6.75,6.75");    
+                      
+                    //console.log(dIn)
+                             var margin = {Top:10, Right: 20, Bottom:10, Left: 40} ;
+                             
+                             var xywh = currBubble[0][0].getBoundingClientRect();
+
+                             var parentXywh = svg[0][0].getBoundingClientRect();
+
+                             var newY = (xywh.top - parentXywh.top) + (xywh.height/2);
+
+                             var swoopCoords = [ currBubble.attr('cx')-3, newY ]; //(xywh.width/2)
+
+                             console.log(xywh, parentXywh )
+                             
+
+                              var swoopy = swoopyArrow()
+                                .angle(Math.PI/4)
+                                .x(function(d) { return d[0]; })
+                                .y(function(d) { return d[1]; });
+
+
+                              var starManHolder = svg.append('g');  
+
+                              starManHolder.append("path")
+                                .attr('marker-end', 'url(#arrowhead)')
+                                .datum([[margin.Left*2, 135 ],swoopCoords])
+                                .style("fill","none")
+                                .style("stroke","#666")
+                                .attr("d",  swoopy );
+
+                              var swoopyName = starManHolder.append('text')
+                                .attr('class','strikerate-fee')
+                                .attr('dx', margin.Left*2)
+                                .attr('dy', 150)
+                                .attr('text-anchor','middle')
+
+                              swoopyName.append('tspan')
+                                .text("LIKE here")  
+
+                              var swoopyPictured = starManHolder.append('text')                                
+                                .attr('text-anchor','middle')
+                                .attr('dx', margin.Left*2)
+                                .attr('dy', 168)
+                                .attr('class','strikerate-fee')
+
+                              swoopyPictured.append('tspan')
+                                .text("(pictured)")    
+                      }
