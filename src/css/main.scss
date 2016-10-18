@@ -93,7 +93,7 @@ figure.interactive {
 }
 
 .l-side-margins.gv-bg-black:before, .l-side-margins.gv-bg-black:after {
-        background: rgba(0,0,0,0.08);
+        background: rgba(0, 0, 0, 0.08);
 }
 
 
@@ -121,9 +121,7 @@ figure.interactive {
 
 .article--standard .article__body .element-interactive {
     width: 100%;
-
 }
-
 
 .js-on.is-modern .content--interactive .element-interactive {
     background-color: transparent;
@@ -134,4 +132,20 @@ figure.interactive {
     font-size: 12px;
     fill:rgb(181,181,181);
     
+}
+
+.chart-bubble{
+  
+}
+
+.AR{
+    fill: red;
+    stroke: red;
+    stroke-width: 0;
+}
+
+.TH{
+    fill: blue;
+    stroke: blue;
+    stroke-width: 0;
 }

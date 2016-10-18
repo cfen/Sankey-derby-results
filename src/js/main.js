@@ -19,6 +19,10 @@ var globalSvgH = 300;
 
 var globalChartMargin = {top:24, right:0, bottom:0, left:10 }
 
+var globalBubbleSize = 5;
+
+var globalTeamObj;
+
 var gameSize;
 
 var guGrid = { gutter: 12, margin:20 } 
@@ -70,8 +74,11 @@ function addD3El(){
                 var n = 0;
                 var lastWinningTeam;
 
+                if( n > 0 ){ console.log( d[n-1] )};
 
                 _data.forEach(function(a) {
+
+
                     d.push([]), 
                     node = {}, 
                     node.key = a.away, 
@@ -258,6 +265,8 @@ function addD3El(){
                     s[a.key] = a;  
                 }), 
 
+                globalTeamObj = s;
+
 
                  d3.json("https://interactive.guim.co.uk/docsdata-test/18uWr4OKGoJSPO3OVeKtxpwjGb2Iu1VDJeUDHKap-qn0.json", function(g) {
 
@@ -272,8 +281,8 @@ function addD3El(){
                             o.decadeKey = getDecade(o.season)[1],
                             // o.home = o.HomeTeam == "Spurs" ? "TH" : "AR",
                             // o.away = o.HomeTeam == "Arsenal" ? "AR" : "TH",
-                            o.home = o.HomeTeam == "Spurs" ? "MC" : "MU",
-                            o.away = o.HomeTeam == "Arsenal" ? "MC" : "MU",
+                            o.home = o.HomeTeam == "Spurs" ? "TH" : "AR",
+                            o.away = o.HomeTeam == "Arsenal" ? "TH" : "AR",
                             o.homeScore = Number(o.Score.split("-")[0]),
                             o.awayScore = Number(o.Score.split("-")[1]),
                             o.home_prob = o.homeScore/10,
@@ -335,10 +344,6 @@ function addD3El(){
                 })
             })
 
-
-
-
-
         }();
 
    function y(a) {
@@ -356,15 +361,14 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
     maxGames = maxGames*4;
 
     globalTeamsArr = teamsArr;
+
+    console.log(teamsArr)
     
     //var newTgt = document.getElementById(teamsArr, targetEl);
     var currSVG;
     var tgtW = d3.select(targetEl)[0][0].offsetWidth;
 
     var tgtH = globalChartH;
-
-
-    console.log(tgtH)
 
     gameSize = tgtW/maxGames;
     //var allGameSize = gameSize * (arrIn.length);
@@ -449,15 +453,12 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                     var displaySeason = " ";
                     // add weeks text 
 
-                    console.log(v);
-
-
                     C.append("text").attr("class", "weekLabel").attr("x", function(a) {
                         //console.log(a.x)
                         return a.x+ (guGrid.margin/2)
                     }).attr("y", 0)
                     .text(function(a, b) {
-                        console.log(a)
+                        
                         if (a.season != displaySeason){ 
                             displaySeason = a.season; 
                             var shortTxt = a['season'].split('–')[0]+'–'+a['season'].split('–')[1].substring(2);
@@ -465,18 +466,6 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                             return shortTxt 
                         }
                         
-                        // var displayTxt;
-                        // var newObj = { }
-                        // console.log(r[b])
-                        // if(r[b]['season'] != displaySeason){ _seasonsMarkers.push(a.x) };
-
-                        // var shortTxt = r[b]['season'].split('–')[0].substring(2)+'–'+r[b]['season'].split('–')[1].substring(2);
-                        //     r[b]['season'] != displaySeason ? displayTxt = displaySeason = r[b]['season'] : displayTxt = " ";
-
-                        // //r[b]['season'] != displaySeason ? shortTxt = shortTxt : shortTxt = " ";
-                        // //console.log(a,displayTxt);
-
-                        // return displayTxt
                     }),
 
                     _seasonsMarkers.forEach(function(point) {
@@ -488,63 +477,55 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                         .attr("y2",globalSvgH );
                     });
 
-
-                    
-
-                    
-
                     addGradients(nodeHolder);
                     var tempGrad;
                     //add links data
+
                     var D = (nodeHolder.append("g")
-                        .selectAll(".link")
-                        .data(z)
-                        .enter()
-                        .append("path")
-                        .attr("class", function(a) {
-                        return "link " + a.key
-                    }).attr("d", w)
+                                .selectAll(".link")
+                                .data(z)
+                                .enter()
+                                .append("path")
+                                .attr("class", function(a) {
+                                return "link " + a.key
+                            }).attr("d", w)
 
-                    .style("fill", function(a) {
+                            .style("fill", function(a) {
 
-                        // console.log(a)
+                                // console.log(a)
 
-                        if (a.key == "MC" && a.target.win){ tempGrad = "url(#gradientMCW)"}
-                        if (a.key == "MU" && a.target.win){ tempGrad = "url(#gradientMUW)"}
-                        if (a.key == "MC" && a.target.draw){ tempGrad = "url(#gradientMCD)"}
-                        if (a.key == "MU" && a.target.draw){ tempGrad = "url(#gradientMUD)"}
-                        if (a.key == "MC" && a.target.lose){ tempGrad = "url(#gradientMCL)"}
-                        if (a.key == "MU" && a.target.lose){ tempGrad = "url(#gradientMUL)"}
+                                if (a.key == "TH" && a.target.win){ tempGrad = "url(#gradientTHW)"}
+                                if (a.key == "AR" && a.target.win){ tempGrad = "url(#gradientARW)"}
+                                if (a.key == "TH" && a.target.draw){ tempGrad = "url(#gradientTHD)"}
+                                if (a.key == "AR" && a.target.draw){ tempGrad = "url(#gradientARD)"}
+                                if (a.key == "TH" && a.target.lose){ tempGrad = "url(#gradientTHL)"}
+                                if (a.key == "AR" && a.target.lose){ tempGrad = "url(#gradientARL)"}
 
-                        return(tempGrad)
+                                return(tempGrad)
 
-                    })
-                    //.style("fill-opacity", a)
-                    .style("stroke", function(a) {                    
-                        return y(a.key)
-                    })
-                    //.style("fill-opacity", 0.5)
-                    .style("stroke-width", .5)
-                    .style("stroke-opacity", b), 
+                            })
+                            //.style("fill-opacity", a)
+                            .style("stroke", function(a) {                    
+                                return y(a.key)
+                            })
+                            //.style("fill-opacity", 0.5)
+                            .style("stroke-width", .5)
+                            .style("stroke-opacity", b), 
 
-                    nodeHolder.append("g")
-                    .selectAll(".node")
-                    .data(A)
-                    .enter().append("g")
-                    .attr("class", "node").attr("transform", function(a) {
-
-                       // console.log(a, gameSize)
-                        //console.log(a,"Add this functionality to drawing of lines");
-                        // var NewY;
-                        // a.key == a.gameKey.split("_")[0] ? NewY = 0 : NewY = a.game.home_prob * 10 * 65;
-                        return "translate(" + a.x + ", "+a.y+")"//" + a.y + "
-                    }));
+                            nodeHolder.append("g")
+                            .selectAll(".node")
+                            .data(A)
+                            .enter().append("g")
+                            .attr("class", "node")
+                   
+                   );
                     
-                    D.append("rect").attr("class", function(a) {
+                    D.append("g").attr("class", function(a) {
 
                     var currBubble = d3.select(this) 
                     if(a.week == 3){  annotate(currBubble, a, currSVG)  } 
-                        return "game " + a.key + " " + a.gameKey
+                        return "game " + a.key + " " + a.gameKey,
+                        addGoals(currBubble, a)
                     })
                     .attr("y",function(a) {
                         return a.dy
@@ -553,7 +534,6 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                     //     return a.dx/2
                     // })
                     .attr("height", function(a) {
-                      
                         return a.dy
                     })
 
@@ -566,15 +546,13 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                     .style("stroke", function(a) {
                         return y(a.key)
                     })
-                    .style("stroke-opacity", e)
+                    //.style("stroke-opacity", e)
                     .on("mouseover", function(a) {
                         mouseOver(a,h,p,q, this)
                     })
                     .on("mouseout", function(a) {
                         mouseExit(a,h,p,q)
                     })
-                  
-
                 
                 var tgtShim = (tgtW - nodeHolder.attr("width"))/2 ;
 
@@ -669,10 +647,12 @@ function getWinningTeam(a){
 
 
 function y(a) {
+
+        //console.log(a)
         // output different colors for arse and spurs
         var c = globalTeamsArr[a].color
 
-        c == "#b00101" ? c ="#b00101" : c = "#005689";
+        //c == "#b00101" ? c ="#b00101" : c = "#005689";
 
         // c == "#5cbfeb" ? c ="#ff9b0b" : c = "#005689";
 
@@ -699,7 +679,7 @@ function getMax( maxHScore, maxAScore){
                 if (yy1 >= 2000 && yy2 <= 2010){ s = ['2000s', 5]}
                 if (yy1 >= 2010 && yy2 <= 2020){ s = ['2010s', 6]}
 
-            return s    
+            return s
         }
 
         function getMonthNum(month){
@@ -751,222 +731,326 @@ function getMax( maxHScore, maxAScore){
         }
 
 function addGradients(u){
-        var tempColorMC = y("MC");
+        var tempColorTH = y("TH");
 
-        var tempColorMU = y("MU");      
+        var tempColorAR = y("AR");      
 
         //Win games grads
-        var gradientMCW = u.append("defs")
+        var gradientTHW = u.append("defs")
           .append("linearGradient")
-            .attr("id", "gradientMCW")
+            .attr("id", "gradientTHW")
             .attr("x1", "0%")
             .attr("y1", "0%")
             .attr("x2", "100%")
             .attr("y2", "100%")
             .attr("spreadMethod", "pad");
 
-        gradientMCW.append("stop")
+        gradientTHW.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", tempColorMC)
+            .attr("stop-color", tempColorTH)
             .attr("stop-opacity", 0.8);    
 
-        gradientMCW.append("stop")
+        gradientTHW.append("stop")
             .attr("offset", "50%")
-            .attr("stop-color", tempColorMC)
+            .attr("stop-color", tempColorTH)
             .attr("stop-opacity", 0.6);
 
-        gradientMCW.append("stop")
+        gradientTHW.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", tempColorMC)
+            .attr("stop-color", tempColorTH)
             .attr("stop-opacity", 0.8);
 
-        var gradientMUW = u.append("defs")
+        var gradientARW = u.append("defs")
           .append("linearGradient")
-            .attr("id", "gradientMUW")
+            .attr("id", "gradientARW")
             .attr("x1", "0%")
             .attr("y1", "0%")
             .attr("x2", "100%")
             .attr("y2", "100%")
             .attr("spreadMethod", "pad");
 
-        gradientMUW.append("stop")
+        gradientARW.append("stop")
             .attr("offset", "0%")
-            .attr("stop-color", tempColorMU)
+            .attr("stop-color", tempColorAR)
             .attr("stop-opacity", 0.8);
 
-        gradientMUW.append("stop")
+        gradientARW.append("stop")
             .attr("offset", "50%")
-            .attr("stop-color", tempColorMU)
+            .attr("stop-color", tempColorAR)
             .attr("stop-opacity", 0.6);
 
-        gradientMUW.append("stop")
+        gradientARW.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", tempColorMU)
+            .attr("stop-color", tempColorAR)
             .attr("stop-opacity", 0.8);
 
 
 
 //Draw games grads
-        var gradientMCD = u.append("defs")
+        var gradientTHD = u.append("defs")
           .append("linearGradient")
-            .attr("id", "gradientMCD")
+            .attr("id", "gradientTHD")
             .attr("x1", "0%")
             .attr("y1", "0%")
             .attr("x2", "100%")
             .attr("y2", "100%")
             .attr("spreadMethod", "pad");
 
-        gradientMCD.append("stop")
+        gradientTHD.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", tempColorMC)
+            .attr("stop-color", tempColorTH)
             .attr("stop-opacity", 0.5);    
 
-        gradientMCD.append("stop")
+        gradientTHD.append("stop")
             .attr("offset", "50%")
-            .attr("stop-color", tempColorMC)
+            .attr("stop-color", tempColorTH)
             .attr("stop-opacity", 0.3);
 
-        gradientMCD.append("stop")
+        gradientTHD.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", tempColorMC)
+            .attr("stop-color", tempColorTH)
             .attr("stop-opacity", 0.5);
 
-        var gradientMUD = u.append("defs")
+        var gradientARD = u.append("defs")
           .append("linearGradient")
-            .attr("id", "gradientMUD")
+            .attr("id", "gradientARD")
             .attr("x1", "0%")
             .attr("y1", "0%")
             .attr("x2", "100%")
             .attr("y2", "100%")
             .attr("spreadMethod", "pad");
 
-        gradientMUD.append("stop")
+        gradientARD.append("stop")
             .attr("offset", "0%")
-            .attr("stop-color", tempColorMU)
+            .attr("stop-color", tempColorAR)
             .attr("stop-opacity", 0.5);
 
-        gradientMUD.append("stop")
+        gradientARD.append("stop")
             .attr("offset", "50%")
-            .attr("stop-color", tempColorMU)
+            .attr("stop-color", tempColorAR)
             .attr("stop-opacity", 0.3);
 
-        gradientMUD.append("stop")
+        gradientARD.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", tempColorMU)
+            .attr("stop-color", tempColorAR)
             .attr("stop-opacity", 0.5);
 
     // game lost
-        var gradientMCL = u.append("defs")
+        var gradientTHL = u.append("defs")
           .append("linearGradient")
-            .attr("id", "gradientMCL")
+            .attr("id", "gradientTHL")
             .attr("x1", "0%")
             .attr("y1", "0%")
             .attr("x2", "100%")
             .attr("y2", "100%")
             .attr("spreadMethod", "pad");
 
-        gradientMCL.append("stop")
+        gradientTHL.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", tempColorMC)
+            .attr("stop-color", tempColorTH)
             .attr("stop-opacity", 0.3);    
 
-        gradientMCL.append("stop")
+        gradientTHL.append("stop")
             .attr("offset", "50%")
-            .attr("stop-color", tempColorMC)
+            .attr("stop-color", tempColorTH)
             .attr("stop-opacity", 0.1);
 
-        gradientMCL.append("stop")
+        gradientTHL.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", tempColorMC)
+            .attr("stop-color", tempColorTH)
             .attr("stop-opacity", 0.3);
 
-        var gradientMUL = u.append("defs")
+        var gradientARL = u.append("defs")
           .append("linearGradient")
-            .attr("id", "gradientMUL")
+            .attr("id", "gradientARL")
             .attr("x1", "0%")
             .attr("y1", "0%")
             .attr("x2", "100%")
             .attr("y2", "100%")
             .attr("spreadMethod", "pad");
 
-        gradientMUL.append("stop")
+        gradientARL.append("stop")
             .attr("offset", "0%")
-            .attr("stop-color", tempColorMU)
+            .attr("stop-color", tempColorAR)
             .attr("stop-opacity", 0.3);
 
-        gradientMUL.append("stop")
+        gradientARL.append("stop")
             .attr("offset", "50%")
-            .attr("stop-color", tempColorMU)
+            .attr("stop-color", tempColorAR)
             .attr("stop-opacity", 0.1);
 
-        gradientMUL.append("stop")
+        gradientARL.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", tempColorMU)
+            .attr("stop-color", tempColorAR)
             .attr("stop-opacity", 0.3);        
+
+}
+
+function addGoals(currBubble,dIn){
+    var cSize = 5;
+    var cPad = 2;
+    var cNumber = (dIn.value * 10) + 1;
+    var start = globalChartH / 2;
+    var step = cSize*2;
+    var o = 0;
+
+    for (var n = 0; n < cNumber; n++){
+        var newCirc = currBubble.append('circle')
+            .attr("class", function(dIn){
+                return "chart-bubble "+dIn.key})
+
+            .attr("r", cSize)
+            .attr("cx", 0)
+        // .attr("fill", )
+        .attr("cy", function(dIn){ 
+         
+                if(dIn.win)
+                    { 
+                        o = start - (n*step) - cPad 
+                    } 
+                if(dIn.lose)
+                    {  
+                       o = start + (n*step) + cPad 
+                    } 
+                if(dIn.draw && dIn.winningTeam != dIn.key){
+                    o = start + (n*step) + cPad 
+                }
+                if(dIn.draw && dIn.winningTeam == dIn.key){
+                    o = start + (n*step) + cPad 
+                }
+
+                return o
+        })
+    }
+
+    if(dIn.win){ 
+        currBubble.attr("transform", "translate(" + dIn.x + ", "+(start-cSize)+")") //" + a.y + "
+    } 
+
+    if(dIn.lose){  
+        currBubble.attr("transform", "translate(" + dIn.x + ", "+(start+cSize)+")") //" + a.y + "
+    }
+
+    // if(dIn.draw && !dIn.sourceLinks[0].winningTeam ){
+    //     console.log("draw causing issues solve it here")
+    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start+cSize)+")")
+    // }
+
+    // if(dIn.draw && dIn.sourceLinks[0].winningTeam ){
+
+    //     if (dIn.sourceLinks[0].winningTeam != dIn.key){
+    //         console.log(" draw lost prev ")
+    //         currBubble.attr("transform", "translate(" + dIn.x + ", "+(start+cSize)+")")
+    //     }
+
+    //     if (dIn.sourceLinks[0].winningTeam == dIn.key){
+    //         console.log(" draw won prev ")
+    //         currBubble.attr("transform", "translate(" + dIn.x + ", "+(start-cSize)+")")
+    //     }
+        
+    // }
+
+    if(dIn.draw){
+        console.log("draw causing issues solve it here")
+        currBubble.attr("transform", "translate(" + dIn.x + ", "+(start+cSize)+")")
+    }
+
+    // if(dIn.draw && !dIn.sourceLinks ){
+    //     console.log("special case ")
+    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start-cSize)+")")
+    // }
+
+    // if(dIn.draw && dIn.sourceLinks[0].winningTeam != dIn.key ){
+    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start+cSize)+")")
+    // }
+    // if(dIn.draw && dIn.sourceLinks[0].winningTeam == dIn.key ){
+    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start-cSize)+")")
+    // }
+
+    // if(dIn.draw && !dIn.sourceLinks[0].winningTeam == 'draw' ){
+    //     console.log("special case ")
+    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start-cSize)+")")
+    // }
+
+    
+    // if(dIn.draw && !dIn.winningTeam){
+    //     console.log("handleThis")
+    // }
+    // if(dIn.draw && dIn.winningTeam != dIn.key){
+    //     console.log(dIn, dIn.winningTeam , dIn.key)
+    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start+(cSize*cNumber))+")") //" + a.y + "
+    // }
+
+    // if(dIn.draw && dIn.winningTeam == dIn.key){
+    //     console.log(dIn.winningTeam , dIn.key)
+    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start-(cSize*cNumber))+")") //" + a.y + "
+    // }
+
 
 }
 
 function annotate(currBubble,dIn,svg){
 
-                             svg.append('defs')
-                              .append("marker")
-                                .attr("id", "arrowhead")
-                                .attr("viewBox", "-10 -10 20 20")
-                                .attr("refX", 0)
-                                .attr("refY", 0)
-                                .attr("fill","#666")
-                                .attr("markerWidth", 14)
-                                .attr("markerHeight", 14)
-                                .attr("stroke-width", 1)
-                                .attr("orient", "auto")
-                              .append("polyline")
-                                .attr("stroke-linejoin", "bevel")
-                                .attr("points", "-6.75,-6.75 0,0 -6.75,6.75");    
-                      
-                    //console.log(dIn)
-                             var margin = {Top:10, Right: 20, Bottom:10, Left: 40} ;
-                             
-                             var xywh = currBubble[0][0].getBoundingClientRect();
+                    svg.append('defs')
+                      .append("marker")
+                        .attr("id", "arrowhead")
+                        .attr("viewBox", "-10 -10 20 20")
+                        .attr("refX", 0)
+                        .attr("refY", 0)
+                        .attr("fill","#666")
+                        .attr("markerWidth", 14)
+                        .attr("markerHeight", 14)
+                        .attr("stroke-width", 1)
+                        .attr("orient", "auto")
+                      .append("polyline")
+                        .attr("stroke-linejoin", "bevel")
+                        .attr("points", "-6.75,-6.75 0,0 -6.75,6.75");    
+              
+            //console.log(dIn)
+                     var margin = {Top:10, Right: 20, Bottom:10, Left: 40} ;
+                     
+                     var xywh = currBubble[0][0].getBoundingClientRect();
 
-                             var parentXywh = svg[0][0].getBoundingClientRect();
+                     var parentXywh = svg[0][0].getBoundingClientRect();
 
-                             var newY = (xywh.top - parentXywh.top) + (xywh.height/2);
+                     var newY = (xywh.top - parentXywh.top) + (xywh.height/2);
 
-                             var swoopCoords = [ currBubble.attr('cx')-3, newY ]; //(xywh.width/2)
+                     var swoopCoords = [ currBubble.attr('cx')-3, newY ]; //(xywh.width/2)
 
-                             console.log(xywh, parentXywh )
-                             
+                     
 
-                              var swoopy = swoopyArrow()
-                                .angle(Math.PI/4)
-                                .x(function(d) { return d[0]; })
-                                .y(function(d) { return d[1]; });
+                      var swoopy = swoopyArrow()
+                        .angle(Math.PI/4)
+                        .x(function(d) { return d[0]; })
+                        .y(function(d) { return d[1]; });
 
 
-                              var starManHolder = svg.append('g');  
+                      var starManHolder = svg.append('g');  
 
-                              starManHolder.append("path")
-                                .attr('marker-end', 'url(#arrowhead)')
-                                .datum([[margin.Left*2, 135 ],swoopCoords])
-                                .style("fill","none")
-                                .style("stroke","#666")
-                                .attr("d",  swoopy );
+                      starManHolder.append("path")
+                        .attr('marker-end', 'url(#arrowhead)')
+                        .datum([[margin.Left*2, 135 ],swoopCoords])
+                        .style("fill","none")
+                        .style("stroke","#666")
+                        .attr("d",  swoopy );
 
-                              var swoopyName = starManHolder.append('text')
-                                .attr('class','strikerate-fee')
-                                .attr('dx', margin.Left*2)
-                                .attr('dy', 150)
-                                .attr('text-anchor','middle')
+                      var swoopyName = starManHolder.append('text')
+                        .attr('class','strikerate-fee')
+                        .attr('dx', margin.Left*2)
+                        .attr('dy', 150)
+                        .attr('text-anchor','middle')
 
-                              swoopyName.append('tspan')
-                                .text("LIKE here")  
+                      swoopyName.append('tspan')
+                        .text("LIKE here")  
 
-                              var swoopyPictured = starManHolder.append('text')                                
-                                .attr('text-anchor','middle')
-                                .attr('dx', margin.Left*2)
-                                .attr('dy', 168)
-                                .attr('class','strikerate-fee')
+                      var swoopyPictured = starManHolder.append('text')                                
+                        .attr('text-anchor','middle')
+                        .attr('dx', margin.Left*2)
+                        .attr('dy', 168)
+                        .attr('class','strikerate-fee')
 
-                              swoopyPictured.append('tspan')
-                                .text("(pictured)")    
-                      }
+                      swoopyPictured.append('tspan')
+                        .text("(pictured)")    
+    }
+
+
