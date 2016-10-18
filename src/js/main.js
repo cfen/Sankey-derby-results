@@ -13,6 +13,16 @@ var shareFn = share('Interactive title', 'http://gu.com/p/URL', '#Interactive');
 
 var globalTeamsArr;
 
+var globalChartH = 90;
+
+var globalSvgH = 300;
+
+var globalChartMargin = {top:24, right:0, bottom:0, left:10 }
+
+var gameSize;
+
+var guGrid = { gutter: 12, margin:20 } 
+
 export function init(el, context, config, mediator) {
     el.innerHTML = mainHTML.replace(/%assetPath%/g, config.assetPath);
     addD3El();
@@ -56,11 +66,12 @@ function addD3El(){
 
                 c = [], b = [], d = [];
 
+
                 var n = 0;
                 var lastWinningTeam;
 
-                _data.forEach(function(a) {
 
+                _data.forEach(function(a) {
                     d.push([]), 
                     node = {}, 
                     node.key = a.away, 
@@ -77,6 +88,7 @@ function addD3El(){
                     node.totalWins = 0, 
                     node.type = "away", 
                     node.gameIndex = n, 
+                    node.season = a.season,
                     node.sourceLinks = [], 
                     node.targetLinks = [], 
                     b.push(node), 
@@ -97,6 +109,7 @@ function addD3El(){
                     node.draw = a.away_prob == a.home_prob ? 1 : 0,
                     node.winningTeam = getWinningTeam(a),  
                     node.gameIndex = n, 
+                    node.season = a.season,
                     node.totalWins = 0, 
                     node.sourceLinks = [], 
                     node.targetLinks = [], 
@@ -108,14 +121,16 @@ function addD3El(){
 
                 }), i = m[1] * j, h = (m[1] - d[0].length * i) / d[0].length, e = (m[0] - l) / (d.length - 1), f = h + i;
 
-                h = 90;
+                h = globalChartH; //PASS IT ON!!!!!!!!!!!!!!!!
+
+                var maxVal = _.maxBy(b, 'value');
+                var minVal = _.minBy(b, 'value');
 
                 //console.log(h,i,j,m,l)
 
                 var o = 0;
 
-                d.forEach(function(a) {
-                    
+                d.forEach(function(a) {                    
                     g.push(o * e), 
                     o++
                 }), 
@@ -128,26 +143,26 @@ function addD3El(){
                     var nn;
                     var lastWinner;
 
-                    var circR = h * (bObj.value + 0.05);
+                    var circR = Math.sqrt(bObj.value + 0.1) * 25;   //var circR = h * (bObj.value + 0.05); 
 
-                    bObj.win ?  NewY = 0-(circR/2) : NewY = h-(circR/2); //reverse for vertical version
+                    bObj.win ?  NewY = gameSize - (circR/2)  : NewY = (globalChartH - gameSize) - (circR/2); //reverse for vertical version
 
                     if(bObj.winningTeam != "draw"){
                         lastWinningTeam = bObj.winningTeam;
                     }
 
                     if(bObj.winningTeam=="draw" ){ 
-                        lastWinner = (lastWinningTeam==bObj.key) //Boolean    
-                        lastWinner ? NewY=(h/2)+(circR/2)+1 : NewY=(h/2)-(circR/2)-1;
+                        lastWinner = (lastWinningTeam == bObj.key) //Boolean    
+                        lastWinner ? NewY=(globalChartH/2) - circR  :  NewY=(globalChartH/2); //- gameSize(circR/2)
                     } 
 
                     //bObj.winningTeam =="draw" && bObj.key==lastWinningTeam ? NewY = 46 : NewY = 23; 
                     
                     bObj.sourceLinks = k(bObj, bObj.week), 
                     bObj.targetLinks = a(bObj, bObj.week), 
-                    bObj.x = bObj.week * e, // need to change to plot on date line here
+                    bObj.x = bObj.gameIndex * (gameSize*4), // need to change to plot on date line here
                     bObj.dx = l,
-                    bObj.value >= .5 ? bObj.y = (bObj.gameIndex - 1) * (h) : bObj.y = (bObj.gameIndex - 1) * (h) + h * (1 - bObj.value) + 1,  // LOOK HERE - to set right height/position for links
+                    bObj.value >= .5 ? bObj.y = (bObj.gameIndex - 1) * (globalChartH) : bObj.y = (bObj.gameIndex - 1) * (globalChartH) + globalChartH * (1 - bObj.value) + 1,  // LOOK HERE - to set right height/position for links
                     bObj.y = NewY,
                     bObj.dy = circR;
 
@@ -177,7 +192,7 @@ function addD3El(){
             }
 
             var b, c, d, e, f, g = [],
-                h = 50,
+                h = globalChartH,
                 i = 10,
                 j = .01,
                 k = {},
@@ -277,7 +292,8 @@ function addD3El(){
                         if(decade[0].decadeStr != "pre 1960s"){ filteredArr.push(decade)}
                     })
 
-                    var allGames = []
+                    var allGames = [];
+                    var maxGames = 0;
 
                     _.each(filteredArr, function (decade,k){
 
@@ -293,13 +309,14 @@ function addD3El(){
 
 
                         _.each(decade, function (game){
+                           if(decade.length > maxGames){ maxGames = decade.length}
                             allGames.push(game)
                         });
 
 
 
 
-                        addAlluvChart(decade, s, targetEl, startTime, endTime )
+                        addAlluvChart(decade, s, targetEl, startTime, endTime, maxGames )
 
                         //if(decade[0].decadeStr != "pre 1960s"){ filteredArr.push(decade)}
                     })
@@ -334,7 +351,9 @@ function addD3El(){
 var tempColor;
 var gradient;
 
-function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
+function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
+
+    maxGames = maxGames*4;
 
     globalTeamsArr = teamsArr;
     
@@ -342,8 +361,13 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
     var currSVG;
     var tgtW = d3.select(targetEl)[0][0].offsetWidth;
 
-    var gameSize = tgtW/arrIn.length;
-    var allGameSize = gameSize * (arrIn.length+1);
+    var tgtH = globalChartH;
+
+
+    console.log(tgtH)
+
+    gameSize = tgtW/maxGames;
+    //var allGameSize = gameSize * (arrIn.length);
 
     //tgtW > 780 ? tgtW = 780 : tgtW = tgtW;
 
@@ -362,35 +386,37 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
                 l = (d3.select("#loser"), d3.select("#game_loser_name")), //tooltip
                 m = d3.select("#game_loser_img"), //tooltip
                 n = d3.select("#game_loser_prob"), //tooltip score 
-                o = allGameSize,
+                o = maxGames,
                 p = {
-                    top: 0,
-                    right: 50,
-                    bottom: 120,
-                    left: 50
+                    top: 24,
+                    right: 24,
+                    bottom: 210,
+                    left: 24
                 },
-                q = Math.max(o, 800) - p.left - p.right,
+                q = tgtH,   //Math.max(o, 800) - p.left - p.right
                 r = tgtW  - p.left - p.right, //height of svg
                 s = (d3.format(",.0f"), d3.scale.category20(), 
 
-                currSVG = d3.select(targetEl).append("svg").style("overflow", "visible")
-                    .attr("width", r + p.left + p.right)
+                currSVG = d3.select(targetEl).append("svg")
+                    .style("overflow", "visible")
+                    .attr("width", globalSvgH )
                     .attr("height", q + p.top + p.bottom)),
-                t = s.append("g").attr("width",r), //.attr("transform", "translate(" + p.left + "," + p.top + ")")
-                u = s.append("g").attr("width",300), //.attr("transform", "translate(" + p.left + "," + (p.top + g) + ")")
+                axisHolder = s.append("g").attr("width", tgtW).attr("height",globalChartH).attr("class","axis-holder").attr("transform", "translate(0 , 0)"), //.attr("transform", "translate(" + p.left + "," + p.top + ")")
+                nodeHolder = s.append("g").attr("width",r).attr("class","node-holder").attr("transform", "translate(0 , 30)"),
                 
-                v = d3.alluvial().nodeWidth(1).nodePadding(10).size([q, r - g]),
+                v = d3.alluvial().nodeWidth(1).nodePadding(10).size([ tgtW - g, tgtH]),
                 w = v.link();
-
-                
             
                 var g = arrIn;
                 var game;      
+
+                
                 
                 /////////// BUILDING DECADE FROM HERE
 
-                    r = [], g.forEach(function(a) {
+                    r = [], g.forEach(function(a,i) {
                         //console.log("GET THE POSITION IN RANGE HERE", moment(a.Date).format('X') )  
+                        
                         game = {}, 
                         game.week = Number(a.week), 
                         game.season = a.season, 
@@ -401,52 +427,76 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
                         game.home_prob = Number(a.home_prob), 
                         game.unixStamp = moment(a.Date).format('X'),
                         game.unixPos = ((moment(a.Date).format('X') - moment(startTime).format('X')) / (endTime - startTime)) * 1000, 
-                        game.yPos = q * game.unixPos,
+                        
                         //console.log(game)
                         r.push(game)
                        
                     }), v.data(r).layout();
 
-
                     var z = v.links(),
                         A = v.nodes(),
                         B = v.hOffsets(),
-                        C = t.selectAll(".topLabel").data(B).enter()
+                        C = axisHolder.selectAll(".topLabel").data(A).enter()
+
+                    axisHolder.append("rect")
+                        .style("fill", "rgba(231,231,231,0.25)")
+                        .style("height",globalChartH/3)
+                        .style("width",tgtW)
+                        .style("transform","translate(0, "+ ((globalChartH/3)+globalChartMargin.top)  +"px)");   
+
                     var _seasonsMarkers = [];
 
-                    var displaySeason;    
+                    var displaySeason = " ";
                     // add weeks text 
-                    
+
+                    console.log(v);
+
+
                     C.append("text").attr("class", "weekLabel").attr("x", function(a) {
-                        return a + 3
+                        //console.log(a.x)
+                        return a.x+ (guGrid.margin/2)
                     }).attr("y", 0)
                     .text(function(a, b) {
-                        var displayTxt;
-                        if(r[b]['season'] != displaySeason){ _seasonsMarkers.push(a) };
-                        var shortTxt = r[b]['season'].split('–')[0].substring(2)+'–'+r[b]['season'].split('–')[1].substring(2);
-                        r[b]['season'] != displaySeason ? displayTxt = displaySeason = r[b]['season'] : displayTxt = " ";
-
-                        //r[b]['season'] != displaySeason ? shortTxt = shortTxt : shortTxt = " ";
-
+                        console.log(a)
+                        if (a.season != displaySeason){ 
+                            displaySeason = a.season; 
+                            var shortTxt = a['season'].split('–')[0]+'–'+a['season'].split('–')[1].substring(2);
+                            _seasonsMarkers.push(a.x); 
+                            return shortTxt 
+                        }
                         
-                        return displayTxt
+                        // var displayTxt;
+                        // var newObj = { }
+                        // console.log(r[b])
+                        // if(r[b]['season'] != displaySeason){ _seasonsMarkers.push(a.x) };
+
+                        // var shortTxt = r[b]['season'].split('–')[0].substring(2)+'–'+r[b]['season'].split('–')[1].substring(2);
+                        //     r[b]['season'] != displaySeason ? displayTxt = displaySeason = r[b]['season'] : displayTxt = " ";
+
+                        // //r[b]['season'] != displaySeason ? shortTxt = shortTxt : shortTxt = " ";
+                        // //console.log(a,displayTxt);
+
+                        // return displayTxt
                     }),
 
                     _seasonsMarkers.forEach(function(point) {
-                        C.append("line").style("stroke", "#EFEFEF").style("stroke-width","1")
-                        .attr("x1",function(a) {
-                            
-                            return point - 10
-                        })
-                        .attr("x2",function(a) { return point -10 })
+                        
+                        C.append("line").style("stroke", "#EEE").style("stroke-width","1")
+                        .attr("x1",function(a) { return point  })
+                        .attr("x2",function(a) { return point  })
                         .attr("y1", 0)
-                        .attr("y2",tgtW);
+                        .attr("y2",globalSvgH );
                     });
 
-                    addGradients(u);
+
+                    
+
+                    
+
+                    addGradients(nodeHolder);
                     var tempGrad;
                     //add links data
-                    var D = (u.append("g")
+                    var D = (nodeHolder.append("g")
                         .selectAll(".link")
                         .data(z)
                         .enter()
@@ -477,13 +527,13 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
                     .style("stroke-width", .5)
                     .style("stroke-opacity", b), 
 
-                    u.append("g")
+                    nodeHolder.append("g")
                     .selectAll(".node")
                     .data(A)
                     .enter().append("g")
                     .attr("class", "node").attr("transform", function(a) {
 
-                        //console.log(a)
+                       // console.log(a, gameSize)
                         //console.log(a,"Add this functionality to drawing of lines");
                         // var NewY;
                         // a.key == a.gameKey.split("_")[0] ? NewY = 0 : NewY = a.game.home_prob * 10 * 65;
@@ -503,6 +553,7 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
                     //     return a.dx/2
                     // })
                     .attr("r", function(a) {
+                      
                         return a.dy/2
                     })
                     // .attr("width", v.nodeWidth())
@@ -523,10 +574,10 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime){
                   
 
                 
-                var tgtShim = (tgtW - u.attr("width"))/2 ;
+                var tgtShim = (tgtW - nodeHolder.attr("width"))/2 ;
 
-                //rotate alluvial
-                u.attr('transform', 'translate(0 ,50)'); // u.attr('transform', 'translate('+tgtShim+',50)rotate(90)');
+                //transform alluvial
+                nodeHolder.attr('transform', 'translate('+(guGrid.gutter*2)+ ','+guGrid.margin+')'); // u.attr('transform', 'translate('+tgtShim+',50)rotate(90)');
 
 
 
