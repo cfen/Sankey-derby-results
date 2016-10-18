@@ -540,22 +540,24 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                         return "translate(" + a.x + ", "+a.y+")"//" + a.y + "
                     }));
                     
-                    D.append("circle").attr("class", function(a) {
+                    D.append("rect").attr("class", function(a) {
 
                     var currBubble = d3.select(this) 
                     if(a.week == 3){  annotate(currBubble, a, currSVG)  } 
                         return "game " + a.key + " " + a.gameKey
                     })
-                    .attr("cy",function(a) {
-                        return a.dy/2
+                    .attr("y",function(a) {
+                        return a.dy
                     })
                     // .attr("cx",function(a) {
                     //     return a.dx/2
                     // })
-                    .attr("r", function(a) {
+                    .attr("height", function(a) {
                       
-                        return a.dy/2
+                        return a.dy
                     })
+
+                    .attr("width", globalChartMargin.left)
                     // .attr("width", v.nodeWidth())
                     .style("fill", function(a) {
                         return y(a.key)
