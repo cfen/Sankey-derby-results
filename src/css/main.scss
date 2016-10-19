@@ -138,14 +138,19 @@ figure.interactive {
   
 }
 
+.zero-axis{
+    stroke: #999;
+    stroke-width:0.5;
+}
+
 .AR{
-    fill: red;
-    stroke: red;
-    stroke-width: 0;
+    fill: #EFEFEF;
+    stroke: #d61d00;
+    stroke-width: 0.5;
 }
 
 .TH{
-    fill: blue;
-    stroke: blue;
-    stroke-width: 0;
+    fill: #EFEFEF;
+    stroke: #005689;
+    stroke-width: 0.5;
 }

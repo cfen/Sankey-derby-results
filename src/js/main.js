@@ -4,27 +4,18 @@ import share from './lib/share'
 import _ from 'lodash'
 import moment from 'moment'
 import iframeMessenger from "https://interactive.guim.co.uk/libs/iframe-messenger/iframeMessenger.js"
-
 import d3 from './lib/d3.min_04_30_15.js'
-
 import swoopyArrow from './lib/swoopyArrow'
 
 var shareFn = share('Interactive title', 'http://gu.com/p/URL', '#Interactive');
-
 var globalTeamsArr;
-
 var globalChartH = 90;
-
 var globalSvgH = 300;
-
 var globalChartMargin = {top:24, right:0, bottom:0, left:10 }
-
-var globalBubbleSize = 5;
-
+var globalGranuleSize = 4;
+var globalGranulePad = 1;
 var globalTeamObj;
-
 var gameSize;
-
 var guGrid = { gutter: 12, margin:20 } 
 
 export function init(el, context, config, mediator) {
@@ -77,8 +68,6 @@ function addD3El(){
                 if( n > 0 ){ console.log( d[n-1] )};
 
                 _data.forEach(function(a) {
-
-
                     d.push([]), 
                     node = {}, 
                     node.key = a.away, 
@@ -151,31 +140,57 @@ function addD3El(){
                     var lastWinner;
 
                     var circR = Math.sqrt(bObj.value + 0.1) * 25;   //var circR = h * (bObj.value + 0.05); 
+                    var goalsSize = ((bObj.value + 0.1) * 10) * globalGranuleSize;
+                    
+                    bObj.sourceLinks = k(bObj, bObj.week), 
+                    bObj.targetLinks = a(bObj, bObj.week), 
+                    bObj.x = bObj.gameIndex * (gameSize * 4), // need to change to plot on date line here
+                    bObj.dx = l,
+                    bObj.value >= .5 ? bObj.y = (bObj.gameIndex - 1) * (globalChartH) : bObj.y = (bObj.gameIndex - 1) * (globalChartH) + globalChartH * (1 - bObj.value) + 1,  // LOOK HERE - to set right height/position for links
+                    bObj.y = NewY,
+                    bObj.dy = goalsSize;
 
-                    bObj.win ?  NewY = gameSize - (circR/2)  : NewY = (globalChartH - gameSize) - (circR/2); //reverse for vertical version
-
+                    if(bObj.win) { NewY = ((globalChartH/2)) }
+                    if(bObj.lose){ NewY = ((globalChartH/2)) }
                     if(bObj.winningTeam != "draw"){
                         lastWinningTeam = bObj.winningTeam;
                     }
 
-                    if(bObj.winningTeam=="draw" ){ 
+                    if(bObj.winningTeam == "draw" ){ 
                         lastWinner = (lastWinningTeam == bObj.key) //Boolean    
-                        lastWinner ? NewY=(globalChartH/2) - circR  :  NewY=(globalChartH/2); //- gameSize(circR/2)
+                        lastWinner ? NewY = (globalChartH/2)  :  NewY = (globalChartH/2); //- gameSize(circR/2)
                     } 
 
-                    //bObj.winningTeam =="draw" && bObj.key==lastWinningTeam ? NewY = 46 : NewY = 23; 
-                    
-                    bObj.sourceLinks = k(bObj, bObj.week), 
-                    bObj.targetLinks = a(bObj, bObj.week), 
-                    bObj.x = bObj.gameIndex * (gameSize*4), // need to change to plot on date line here
-                    bObj.dx = l,
-                    bObj.value >= .5 ? bObj.y = (bObj.gameIndex - 1) * (globalChartH) : bObj.y = (bObj.gameIndex - 1) * (globalChartH) + globalChartH * (1 - bObj.value) + 1,  // LOOK HERE - to set right height/position for links
-                    bObj.y = NewY,
-                    bObj.dy = circR;
+                    if(bObj.winningTeam =="draw" && lastWinningTeam!="draw" && bObj.key==lastWinningTeam) { 
+                        bObj.drawKey = lastWinningTeam 
+                    }; 
+
+                    if(bObj.winningTeam == "draw" && !lastWinningTeam) { 
+                        var numRef = count;
+                        var futureMatch =  bObj.targetLinks[0]
+                        checkFutureMatch(futureMatch)
+
+                            function checkFutureMatch(match){
+                                console.log(match)
+                                if(match.winningTeam == "draw" || !match.winningTeam){
+                                    numRef ++
+                                    console.log(b[numRef])
+                                    futureMatch = b[numRef]
+                                    checkFutureMatch(futureMatch);
+                                } 
+                                if(match.winningTeam != "draw" ){
+                                    bObj.drawKey = match.winningTeam;
+                                }
+                            }
+                        
+                        console.log(bObj, count)
+                        
+                        
+                    }; 
+
 
                 }), b.forEach(function(b) {
                     if (b.week < d.length - 1) {
-                        
                         //console.log(b)
                         var e = a(b, b.week);
                         if (e.length > 0) {
@@ -283,8 +298,23 @@ function addD3El(){
                             // o.away = o.HomeTeam == "Arsenal" ? "AR" : "TH",
                             o.home = o.HomeTeam == "Spurs" ? "TH" : "AR",
                             o.away = o.HomeTeam == "Arsenal" ? "TH" : "AR",
-                            o.homeScore = Number(o.Score.split("-")[0]),
-                            o.awayScore = Number(o.Score.split("-")[1]),
+
+
+                            o.homeScore = o.HomeTeam == "Spurs" ? "TH" : "AR",
+                            o.awayScore = o.HomeTeam == "Arsenal" ? "TH" : "AR",
+
+
+                            // o.homeScore = Number(o.Score.split("-")[0]),
+                            // o.awayScore = Number(o.Score.split("-")[1]),
+
+
+                            o.scoreSpurs = Number(o.Score.split("-")[0]),
+                            o.scoreArse = Number(o.Score.split("-")[1]),
+                            
+                            o.home == "TH" ? o.homeScore = o.scoreSpurs : o.homeScore = o.scoreArse,
+                            o.away == "TH" ? o.awayScore = o.scoreSpurs : o.awayScore = o.scoreArse,
+
+
                             o.home_prob = o.homeScore/10,
                             o.away_prob = o.awayScore/10,
                             o.comp = o.Competition.split(" ").join("_"),
@@ -361,8 +391,6 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
     maxGames = maxGames*4;
 
     globalTeamsArr = teamsArr;
-
-    console.log(teamsArr)
     
     //var newTgt = document.getElementById(teamsArr, targetEl);
     var currSVG;
@@ -406,9 +434,9 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                     .attr("width", globalSvgH )
                     .attr("height", q + p.top + p.bottom)),
                 axisHolder = s.append("g").attr("width", tgtW).attr("height",globalChartH).attr("class","axis-holder").attr("transform", "translate(0 , 0)"), //.attr("transform", "translate(" + p.left + "," + p.top + ")")
-                nodeHolder = s.append("g").attr("width",r).attr("class","node-holder").attr("transform", "translate(0 , 30)"),
+                nodeHolder = s.append("g").attr("width",r).attr("class", "node-holder"),
                 
-                v = d3.alluvial().nodeWidth(1).nodePadding(10).size([ tgtW - g, tgtH]),
+                v = d3.alluvial().nodeWidth(1).nodePadding(10).size([ tgtW - g,  0]),
                 w = v.link();
             
                 var g = arrIn;
@@ -442,11 +470,13 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                         B = v.hOffsets(),
                         C = axisHolder.selectAll(".topLabel").data(A).enter()
 
-                    axisHolder.append("rect")
-                        .style("fill", "rgba(231,231,231,0.25)")
-                        .style("height",globalChartH/3)
-                        .style("width",tgtW)
-                        .style("transform","translate(0, "+ ((globalChartH/3)+globalChartMargin.top)  +"px)");   
+                    axisHolder.append("line")
+                        .attr("id","zeroAxis")
+                        .attr("class", "zero-axis")
+                        .attr("x1",0)
+                        .attr("x2",tgtW)
+                        .attr("y1",(globalChartH/2)+(guGrid.gutter*2)-(globalGranulePad*4))
+                        .attr("y2",(globalChartH/2)+(guGrid.gutter*2)-(globalGranulePad*4));   
 
                     var _seasonsMarkers = [];
 
@@ -887,105 +917,38 @@ function addGradients(u){
 }
 
 function addGoals(currBubble,dIn){
-    var cSize = 5;
-    var cPad = 2;
-    var cNumber = (dIn.value * 10) + 1;
+
+    var cNumber = (dIn.value * 10);
     var start = globalChartH / 2;
-    var step = cSize*2;
+    var step = globalGranulePad + globalGranuleSize;
     var o = 0;
+    //var transClipY;
 
-    for (var n = 0; n < cNumber; n++){
-        var newCirc = currBubble.append('circle')
-            .attr("class", function(dIn){
-                return "chart-bubble "+dIn.key})
+        for (var n = 0; n < cNumber; n++){
+            var newCirc = currBubble.append('circle')
+                .attr("class", function(dIn){ return "chart-bubble "+dIn.key})
+                .attr("r", globalGranuleSize)
+                .attr("cx", 0)
+                .attr("cy", function(dIn){ 
+             
+                    if(dIn.win || (dIn.draw && dIn.drawKey == dIn.key)){ 
+                            start = start - step;
+                            o = start - (n*(step)) ;
+                            //transClipY = (globalChartH/2)-Math.ceil(globalGranuleSize/2);
+                        } 
+                    
+                    if(dIn.lose || (dIn.draw && dIn.drawKey != dIn.key)){  
+                           start = start + step;
+                           o = start + (n*(step)) ;
+                           //transClipY = (globalChartH/2)+Math.ceil(globalGranuleSize/2);
+                        } 
 
-            .attr("r", cSize)
-            .attr("cx", 0)
-        // .attr("fill", )
-        .attr("cy", function(dIn){ 
-         
-                if(dIn.win)
-                    { 
-                        o = start - (n*step) - cPad 
-                    } 
-                if(dIn.lose)
-                    {  
-                       o = start + (n*step) + cPad 
-                    } 
-                if(dIn.draw && dIn.winningTeam != dIn.key){
-                    o = start + (n*step) + cPad 
-                }
-                if(dIn.draw && dIn.winningTeam == dIn.key){
-                    o = start + (n*step) + cPad 
-                }
-
-                return o
-        })
-    }
-
-    if(dIn.win){ 
-        currBubble.attr("transform", "translate(" + dIn.x + ", "+(start-cSize)+")") //" + a.y + "
-    } 
-
-    if(dIn.lose){  
-        currBubble.attr("transform", "translate(" + dIn.x + ", "+(start+cSize)+")") //" + a.y + "
-    }
-
-    // if(dIn.draw && !dIn.sourceLinks[0].winningTeam ){
-    //     console.log("draw causing issues solve it here")
-    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start+cSize)+")")
-    // }
-
-    // if(dIn.draw && dIn.sourceLinks[0].winningTeam ){
-
-    //     if (dIn.sourceLinks[0].winningTeam != dIn.key){
-    //         console.log(" draw lost prev ")
-    //         currBubble.attr("transform", "translate(" + dIn.x + ", "+(start+cSize)+")")
-    //     }
-
-    //     if (dIn.sourceLinks[0].winningTeam == dIn.key){
-    //         console.log(" draw won prev ")
-    //         currBubble.attr("transform", "translate(" + dIn.x + ", "+(start-cSize)+")")
-    //     }
-        
-    // }
-
-    if(dIn.draw){
-        console.log("draw causing issues solve it here")
-        currBubble.attr("transform", "translate(" + dIn.x + ", "+(start+cSize)+")")
-    }
-
-    // if(dIn.draw && !dIn.sourceLinks ){
-    //     console.log("special case ")
-    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start-cSize)+")")
-    // }
-
-    // if(dIn.draw && dIn.sourceLinks[0].winningTeam != dIn.key ){
-    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start+cSize)+")")
-    // }
-    // if(dIn.draw && dIn.sourceLinks[0].winningTeam == dIn.key ){
-    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start-cSize)+")")
-    // }
-
-    // if(dIn.draw && !dIn.sourceLinks[0].winningTeam == 'draw' ){
-    //     console.log("special case ")
-    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start-cSize)+")")
-    // }
+                    return o;
+            })
+        }
 
     
-    // if(dIn.draw && !dIn.winningTeam){
-    //     console.log("handleThis")
-    // }
-    // if(dIn.draw && dIn.winningTeam != dIn.key){
-    //     console.log(dIn, dIn.winningTeam , dIn.key)
-    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start+(cSize*cNumber))+")") //" + a.y + "
-    // }
-
-    // if(dIn.draw && dIn.winningTeam == dIn.key){
-    //     console.log(dIn.winningTeam , dIn.key)
-    //     currBubble.attr("transform", "translate(" + dIn.x + ", "+(start-(cSize*cNumber))+")") //" + a.y + "
-    // }
-
+   currBubble.attr("transform", "translate(" + dIn.x + ", 0)") //" + a.y + " // transClipY 
 
 }
 
