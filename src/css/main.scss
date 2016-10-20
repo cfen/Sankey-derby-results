@@ -138,14 +138,16 @@ figure.interactive {
   
 }
 
+
+
 .zero-axis{
     stroke: #999;
     stroke-width:0.5;
 }
 
 .AR{
-    fill: #EFEFEF;
-    stroke: #d61d00;
+    fill: #d61d00;
+    stroke: #720E00;
     stroke-width: 0.5;
 }
 
@@ -153,4 +155,10 @@ figure.interactive {
     fill: #EFEFEF;
     stroke: #005689;
     stroke-width: 0.5;
+}
+
+.no-score{
+    fill: #CCC;
+    stroke: #999;
+    stroke-width:0.5;
 }

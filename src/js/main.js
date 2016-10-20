@@ -171,7 +171,7 @@ function addD3El(){
                         checkFutureMatch(futureMatch)
 
                             function checkFutureMatch(match){
-                                console.log(match)
+                                
                                 if(match.winningTeam == "draw" || !match.winningTeam){
                                     numRef ++
                                     console.log(b[numRef])
@@ -182,8 +182,6 @@ function addD3El(){
                                     bObj.drawKey = match.winningTeam;
                                 }
                             }
-                        
-                        console.log(bObj, count)
                         
                         
                     }; 
@@ -246,25 +244,26 @@ function addD3El(){
                 return a(), k
             }, k.relayout = function() {
                 return k
-            }, k.link = function() {
-                function a(a) {
+            }, 
+            k.link = function() {
+                // function a(a) {
                     
-                    var c = a.source.x + a.source.dx,
-                        d = a.target.x,
-                        e = d3.interpolateNumber(c, d),
-                        f = e(b),
-                        g = e(1 - b),
-                        h = a.source.y,
-                        i = a.target.y,
-                        j = "M " + c + "," + h + " C " + f + ", " + h + " " + g + ", " + i + " " + d + ", " + i + " L " + d + ", " + (i + a.tdy) + " C " + f + ", " + (i + a.tdy) + " " + f + ", " + (h + a.sdy) + " " + c + ", " + (h + a.sdy) + " L " + c + "," + h;  //  add curves
-                        if(a.source.winningTeam == a.target.winningTeam){ j = "M"+a.source.x+","+a.source.y+" L"+a.target.x+" "+a.target.y+" L"+a.target.x+" "+(a.target.y+a.target.dy)+" L"+a.source.x+" "+(a.source.y+a.source.dy)+" Z" } // remove curves
+                //     var c = a.source.x + a.source.dx,
+                //         d = a.target.x,
+                //         e = d3.interpolateNumber(c, d),
+                //         f = e(b),
+                //         g = e(1 - b),
+                //         h = a.source.y,
+                //         i = a.target.y,
+                //         j = "M " + c + "," + h + " C " + f + ", " + h + " " + g + ", " + i + " " + d + ", " + i + " L " + d + ", " + (i + a.tdy) + " C " + f + ", " + (i + a.tdy) + " " + f + ", " + (h + a.sdy) + " " + c + ", " + (h + a.sdy) + " L " + c + "," + h;  //  add curves
+                //         if(a.source.winningTeam == a.target.winningTeam){ j = "M"+a.source.x+","+a.source.y+" L"+a.target.x+" "+a.target.y+" L"+a.target.x+" "+(a.target.y+a.target.dy)+" L"+a.source.x+" "+(a.source.y+a.source.dy)+" Z" } // remove curves
 
-                    return j
-                }
-                var b = .5;
-                return a.curvature = function(c) {
-                    return arguments.length ? (b = +c, a) : b
-                }, a
+                //     return j
+                // }
+                // var b = .5;
+                // return a.curvature = function(c) {
+                //     return arguments.length ? (b = +c, a) : b
+                // }, a
             }, k
         }, 
 
@@ -600,7 +599,7 @@ function mouseOver(a,h,p,q,circleEl ) {  //this isn't called until rolling over 
         
         var pos = circleEl.getBoundingClientRect();
 
-        console.log(circleEl)
+        console.log(a,circleEl)
 
         d3.selectAll("path." + a.key)
         .transition().style("fill-opacity", .9)
@@ -918,13 +917,28 @@ function addGradients(u){
 
 function addGoals(currBubble,dIn){
 
+    
+
     var cNumber = (dIn.value * 10);
     var start = globalChartH / 2;
     var step = globalGranulePad + globalGranuleSize;
     var o = 0;
     //var transClipY;
 
+    if(dIn.value == 0 && dIn.opponentValue == 0){ 
+        dIn.noScoreDraw = 1; 
+        var yPosi =  dIn.drawKey == dIn.key ? (start - globalGranuleSize) : start;
+        console.log(dIn)
+         var newRect = currBubble.append('rect')
+        .attr("class", function(dIn){ return "no-score"})
+        .attr("height", globalGranuleSize)
+        .attr("width", globalGranuleSize*2)
+        .attr("x", 0)
+        .attr("y", yPosi)
+    }
+
         for (var n = 0; n < cNumber; n++){
+
             var newCirc = currBubble.append('circle')
                 .attr("class", function(dIn){ return "chart-bubble "+dIn.key})
                 .attr("r", globalGranuleSize)
@@ -945,6 +959,8 @@ function addGoals(currBubble,dIn){
 
                     return o;
             })
+
+            
         }
 
     
