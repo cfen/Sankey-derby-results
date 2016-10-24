@@ -141,8 +141,8 @@ figure.interactive {
 
 
 .zero-axis{
-    stroke: #999;
-    stroke-width:0.5;
+    stroke: #EFEFEF;
+
 }
 
 .AR{
@@ -150,6 +150,23 @@ figure.interactive {
     stroke: #720E00;
     stroke-width: 0.5;
 }
+
+.arse-area{
+    // stroke: #720E00;
+    // stroke:0.5;
+    // fill:none;
+    fill: #d61d00;
+    fill-opacity: 0.3;
+}
+
+.spurs-area{
+    // stroke: #005689;
+    // stroke-width:0.5;
+    // fill:none;
+    fill: #005689;
+    fill-opacity: 0.3;
+}
+
 
 .TH{
     fill: #EFEFEF;
@@ -159,6 +176,6 @@ figure.interactive {
 
 .no-score{
     fill: #CCC;
-    stroke: #999;
+    stroke: #CCC;
     stroke-width:0.5;
 }

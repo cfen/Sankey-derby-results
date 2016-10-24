@@ -10,6 +10,7 @@ import swoopyArrow from './lib/swoopyArrow'
 var shareFn = share('Interactive title', 'http://gu.com/p/URL', '#Interactive');
 var globalTeamsArr;
 var globalChartH = 90;
+var globalChartW;
 var globalSvgH = 300;
 var globalChartMargin = {top:24, right:0, bottom:0, left:10 }
 var globalGranuleSize = 4;
@@ -17,6 +18,8 @@ var globalGranulePad = 1;
 var globalTeamObj;
 var gameSize;
 var guGrid = { gutter: 12, margin:20 } 
+
+let centredAxis =(globalChartH/2)+(guGrid.gutter*2)-(globalGranulePad*4);
 
 export function init(el, context, config, mediator) {
     el.innerHTML = mainHTML.replace(/%assetPath%/g, config.assetPath);
@@ -147,11 +150,12 @@ function addD3El(){
                     bObj.x = bObj.gameIndex * (gameSize * 4), // need to change to plot on date line here
                     bObj.dx = l,
                     bObj.value >= .5 ? bObj.y = (bObj.gameIndex - 1) * (globalChartH) : bObj.y = (bObj.gameIndex - 1) * (globalChartH) + globalChartH * (1 - bObj.value) + 1,  // LOOK HERE - to set right height/position for links
-                    bObj.y = NewY,
+                    
+                    
                     bObj.dy = goalsSize;
 
-                    if(bObj.win) { NewY = ((globalChartH/2)) }
-                    if(bObj.lose){ NewY = ((globalChartH/2)) }
+                    if(bObj.win) { NewY = (globalChartH/2) }
+                    if(bObj.lose){ NewY = (globalChartH/2) }
                     if(bObj.winningTeam != "draw"){
                         lastWinningTeam = bObj.winningTeam;
                     }
@@ -165,6 +169,7 @@ function addD3El(){
                         bObj.drawKey = lastWinningTeam 
                     }; 
 
+                     //bObj.y = NewY;
                     if(bObj.winningTeam == "draw" && !lastWinningTeam) { 
                         var numRef = count;
                         var futureMatch =  bObj.targetLinks[0]
@@ -174,9 +179,9 @@ function addD3El(){
                                 
                                 if(match.winningTeam == "draw" || !match.winningTeam){
                                     numRef ++
-                                    console.log(b[numRef])
                                     futureMatch = b[numRef]
                                     checkFutureMatch(futureMatch);
+
                                 } 
                                 if(match.winningTeam != "draw" ){
                                     bObj.drawKey = match.winningTeam;
@@ -186,6 +191,8 @@ function addD3El(){
                         
                     }; 
 
+                bObj.areaChartVal = addChartVal(bObj);   
+                
 
                 }), b.forEach(function(b) {
                     if (b.week < d.length - 1) {
@@ -209,7 +216,12 @@ function addD3El(){
                     }
 
                 })
+
+                
             }
+
+            
+
 
             var b, c, d, e, f, g = [],
                 h = globalChartH,
@@ -354,7 +366,7 @@ function addD3El(){
 
 
 
-                        addAlluvChart(decade, s, targetEl, startTime, endTime, maxGames )
+                        addChart(decade, s, targetEl, startTime, endTime, maxGames )
 
                         //if(decade[0].decadeStr != "pre 1960s"){ filteredArr.push(decade)}
                     })
@@ -367,7 +379,7 @@ function addD3El(){
 
                    // Add all matches to one long svg
                    // var targetEl = "#derbyChart-V";  
-                   // addAlluvChart(allGames, s, targetEl )
+                   // addChart(allGames, s, targetEl )
 
                     
                 })
@@ -385,15 +397,17 @@ function addD3El(){
 var tempColor;
 var gradient;
 
-function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
+function addChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
 
     maxGames = maxGames*4;
 
     globalTeamsArr = teamsArr;
+
+
     
     //var newTgt = document.getElementById(teamsArr, targetEl);
     var currSVG;
-    var tgtW = d3.select(targetEl)[0][0].offsetWidth;
+    var tgtW = globalChartW =d3.select(targetEl)[0][0].offsetWidth;
 
     var tgtH = globalChartH;
 
@@ -433,6 +447,7 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                     .attr("width", globalSvgH )
                     .attr("height", q + p.top + p.bottom)),
                 axisHolder = s.append("g").attr("width", tgtW).attr("height",globalChartH).attr("class","axis-holder").attr("transform", "translate(0 , 0)"), //.attr("transform", "translate(" + p.left + "," + p.top + ")")
+                areaHolder = s.append("g").attr("width", tgtW).attr("height",globalChartH).attr("class","area-holder-ar"),
                 nodeHolder = s.append("g").attr("width",r).attr("class", "node-holder"),
                 
                 v = d3.alluvial().nodeWidth(1).nodePadding(10).size([ tgtW - g,  0]),
@@ -444,6 +459,8 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                 
                 
                 /////////// BUILDING DECADE FROM HERE
+
+
 
                     r = [], g.forEach(function(a,i) {
                         //console.log("GET THE POSITION IN RANGE HERE", moment(a.Date).format('X') )  
@@ -458,8 +475,6 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                         game.home_prob = Number(a.home_prob), 
                         game.unixStamp = moment(a.Date).format('X'),
                         game.unixPos = ((moment(a.Date).format('X') - moment(startTime).format('X')) / (endTime - startTime)) * 1000, 
-                        
-                        //console.log(game)
                         r.push(game)
                        
                     }), v.data(r).layout();
@@ -472,10 +487,11 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                     axisHolder.append("line")
                         .attr("id","zeroAxis")
                         .attr("class", "zero-axis")
+                        .attr("stroke-width",globalGranuleSize)
                         .attr("x1",0)
                         .attr("x2",tgtW)
-                        .attr("y1",(globalChartH/2)+(guGrid.gutter*2)-(globalGranulePad*4))
-                        .attr("y2",(globalChartH/2)+(guGrid.gutter*2)-(globalGranulePad*4));   
+                        .attr("y1",centredAxis)
+                        .attr("y2",centredAxis);   
 
                     var _seasonsMarkers = [];
 
@@ -509,6 +525,8 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                     addGradients(nodeHolder);
                     var tempGrad;
                     //add links data
+
+                    addAreaCharts(A, areaHolder);
 
                     var D = (nodeHolder.append("g")
                                 .selectAll(".link")
@@ -549,6 +567,7 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                    
                    );
                     
+
                     D.append("g").attr("class", function(a) {
 
                     var currBubble = d3.select(this) 
@@ -583,13 +602,10 @@ function addAlluvChart(arrIn, teamsArr, targetEl, startTime, endTime, maxGames){
                         mouseExit(a,h,p,q)
                     })
                 
-                var tgtShim = (tgtW - nodeHolder.attr("width"))/2 ;
+                
 
                 //transform alluvial
                 nodeHolder.attr('transform', 'translate('+(guGrid.gutter*2)+ ','+guGrid.margin+')'); // u.attr('transform', 'translate('+tgtShim+',50)rotate(90)');
-
-
-
 
         /////////// END BUILDING DECADE DATA
 
@@ -915,27 +931,111 @@ function addGradients(u){
 
 }
 
-function addGoals(currBubble,dIn){
+function addChartVal(dIn){
+    var step = (globalGranulePad + globalGranuleSize + globalGranulePad)  
+    var areaChartVal;    
+
+    areaChartVal = Number(dIn.value);
+    //areaChartVal = (areaChartVal * step) + globalGranulePad;
+
+        // if(dIn.value != 0 && (dIn.win || (dIn.draw && dIn.drawKey == dIn.key)) ){
+        //     areaChartVal = 45 - areaChartVal; // make it a negative val for wins to plot over the line
+        // }
+
 
     
+        
+    return areaChartVal;
+}
+
+function addAreaCharts(a, areaHolder){
+   // areaHolder.attr("transform","translate("++",0)")
+
+    _.each(a, function(dIn,i){
+        dIn.areaChartVal = ((dIn.value * 10) * ((globalGranuleSize+globalGranulePad)*2)) + (globalGranuleSize+globalGranulePad);
+        dIn.areaX = dIn.x + (guGrid.gutter*2);
+        if(dIn.win || (dIn.draw && dIn.drawKey == dIn.key)){ 
+                dIn.areaY = centredAxis - globalGranulePad - dIn.areaChartVal
+
+            } 
+                    
+        if(dIn.lose || (dIn.draw && dIn.drawKey != dIn.key)){  
+               dIn.areaY = centredAxis + globalGranulePad + dIn.areaChartVal
+            } 
+    })
+
+    var teamsArr = _.groupBy(a,'key');
+    var arArr;
+    var thArr;
+    var reqHeight = globalChartH;
+    var reqWidth = areaHolder[0].parentNode.offsetWidth;
+
+    var emptyObj = { areaX: 0, areaY: 0  }
+
+    _.each(teamsArr, function(arr,k){
+        k == "TH" ? thArr = arr : arArr = arr;       
+    })
+
+
+    var emptyObj = { areaX: 0, areaY: centredAxis  };
+    thArr.unshift(emptyObj); 
+    arArr.unshift(emptyObj);
+    var lastObj = {  areaX: thArr[thArr.length-1].areaX+(guGrid.margin), areaY: centredAxis  };
+    thArr.push(lastObj); 
+    arArr.push(lastObj); 
+
+
+    _.each(thArr, function(o){
+        console.log(Number(o.areaChartVal * globalGranuleSize) );
+    })
+    
+    // var xScaler = d3.scale.linear().range([0, thArr.length]);
+    // var yScaler = d3.scale.linear().range([0, reqHeight]);
+
+    var areaAr = d3.svg.area()
+        //.interpolate("basis")
+        .x( function(d,i) { return d.areaX ; })
+        .y0( centredAxis )
+        .y1( function(d) { return d.areaY } );
+
+    var areaTh = d3.svg.area()
+        // .interpolate("basis")
+        .x(function(d,i) { return d.areaX ; })        
+        .y0( centredAxis )
+        .y1( function(d) { return d.areaY } );
+
+    areaHolder.append("path")
+      .datum(arArr)
+      .attr("class", "arse-area")
+      .attr("d", areaAr)
+
+    areaHolder.append("path")
+      .datum(thArr)
+      .attr("class", "spurs-area")
+      .attr("d", areaTh)
+
+}
+
+function addGoals(currBubble,dIn){
 
     var cNumber = (dIn.value * 10);
     var start = globalChartH / 2;
     var step = globalGranulePad + globalGranuleSize;
     var o = 0;
-    //var transClipY;
+    var transClipY;
 
     if(dIn.value == 0 && dIn.opponentValue == 0){ 
         dIn.noScoreDraw = 1; 
-        var yPosi =  dIn.drawKey == dIn.key ? (start - globalGranuleSize) : start;
-        console.log(dIn)
+
+        transClipY =  dIn.drawKey == dIn.key ? (start - globalGranuleSize + globalGranulePad + globalGranulePad) : start;
+        
          var newRect = currBubble.append('rect')
-        .attr("class", function(dIn){ return "no-score"})
-        .attr("height", globalGranuleSize)
-        .attr("width", globalGranuleSize*2)
-        .attr("x", 0)
-        .attr("y", yPosi)
-    }
+            .attr("class", function(dIn){ return "no-score"})
+            .attr("height", globalGranuleSize/2)
+            .attr("width", globalGranuleSize*2)
+            .attr("x", 0)
+            .attr("y", 0)
+        }
 
         for (var n = 0; n < cNumber; n++){
 
@@ -946,25 +1046,25 @@ function addGoals(currBubble,dIn){
                 .attr("cy", function(dIn){ 
              
                     if(dIn.win || (dIn.draw && dIn.drawKey == dIn.key)){ 
-                            start = start - step;
+                            start = start - step - 1;
                             o = start - (n*(step)) ;
-                            //transClipY = (globalChartH/2)-Math.ceil(globalGranuleSize/2);
+                            transClipY = 0 - globalGranulePad;
                         } 
                     
                     if(dIn.lose || (dIn.draw && dIn.drawKey != dIn.key)){  
-                           start = start + step;
+                           start = start + step + 1;
                            o = start + (n*(step)) ;
-                           //transClipY = (globalChartH/2)+Math.ceil(globalGranuleSize/2);
+                           transClipY = globalGranulePad;
                         } 
-
+   
                     return o;
             })
-
-            
+  
         }
 
-    
-   currBubble.attr("transform", "translate(" + dIn.x + ", 0)") //" + a.y + " // transClipY 
+   
+   
+   currBubble.attr("transform", "translate(" + dIn.x + ", "+transClipY+")") //" + a.y + " // transClipY 
 
 }
 
@@ -986,23 +1086,16 @@ function annotate(currBubble,dIn,svg){
                         .attr("points", "-6.75,-6.75 0,0 -6.75,6.75");    
               
             //console.log(dIn)
-                     var margin = {Top:10, Right: 20, Bottom:10, Left: 40} ;
-                     
+                     var margin = {Top:10, Right: 20, Bottom:10, Left: 40} ;                    
                      var xywh = currBubble[0][0].getBoundingClientRect();
-
                      var parentXywh = svg[0][0].getBoundingClientRect();
-
                      var newY = (xywh.top - parentXywh.top) + (xywh.height/2);
-
                      var swoopCoords = [ currBubble.attr('cx')-3, newY ]; //(xywh.width/2)
-
-                     
-
+ 
                       var swoopy = swoopyArrow()
                         .angle(Math.PI/4)
                         .x(function(d) { return d[0]; })
                         .y(function(d) { return d[1]; });
-
 
                       var starManHolder = svg.append('g');  
 
@@ -1032,4 +1125,20 @@ function annotate(currBubble,dIn,svg){
                         .text("(pictured)")    
     }
 
+function bumpLayer(n) {
 
+  function bump(a) {
+    var x = 1 / (.1 + Math.random()),
+        y = 2 * Math.random() - .5,
+        z = 10 / (.1 + Math.random());
+    for (var i = 0; i < n; i++) {
+      var w = (i / n - y) * z;
+      a[i] += x * Math.exp(-w * w);
+    }
+  }
+
+  var a = [], i;
+  for (i = 0; i < n; ++i) a[i] = 0;
+  for (i = 0; i < 5; ++i) bump(a);
+  return a.map(function(d, i) { return {x: i, y: Math.max(0, d)}; });
+}
